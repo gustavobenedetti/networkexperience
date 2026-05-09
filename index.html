@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estruturação Comercial</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070707;
+  --surface: #111111;
+  --card: #181818;
+  --border: #242424;
+  --accent: #C8F135;
+  --accent-dim: rgba(200,241,53,0.12);
+  --purple: #8B5CF6;
+  --orange: #F97316;
+  --blue: #38BDF8;
+  --red: #EF4444;
+  --green: #22C55E;
+  --text: #E0E0E0;
+  --muted: #555;
+  --white: #FFFFFF;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+
+body {
+  background: var(--bg);
+  font-family: 'Montserrat', sans-serif;
+  color: var(--text);
+  cursor: none;
+}
+
+/* CURSOR */
+.cursor {
+  position: fixed; width: 10px; height: 10px;
+  background: var(--accent); border-radius: 50%;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s;
+  mix-blend-mode: difference;
+}
+
+/* DECK */
+.deck { width: 100vw; height: 100vh; position: relative; }
+
+/* SLIDES */
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 80px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: translateX(60px);
+  will-change: opacity, transform;
+}
+.slide.active {
+  opacity: 1; pointer-events: all; transform: translateX(0);
+}
+.slide.exit-left {
+  opacity: 0; transform: translateX(-60px);
+}
+.slide.exit-right {
+  opacity: 0; transform: translateX(60px);
+}
+
+/* GRID BG */
+.grid-bg {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  background-image:
+    linear-gradient(rgba(200,241,53,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,241,53,0.02) 1px, transparent 1px);
+  background-size: 70px 70px;
+  animation: gridDrift 25s linear infinite;
+}
+@keyframes gridDrift { 0%{transform:translateY(0)} 100%{transform:translateY(70px)} }
+
+/* NOISE */
+.noise {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 24px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted);
+}
+.nav-counter {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px; color: var(--muted);
+  letter-spacing: 0.1em;
+}
+
+/* PROGRESS */
+.progress-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  height: 2px; background: var(--border);
+}
+.progress-fill {
+  height: 100%; background: var(--accent);
+  transition: width 0.4s ease;
+  box-shadow: 0 0 12px var(--accent);
+}
+
+/* ARROWS */
+.arrows {
+  position: fixed; bottom: 32px; right: 48px; z-index: 100;
+  display: flex; gap: 8px;
+}
+.arrow-btn {
+  width: 40px; height: 40px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; color: var(--muted); font-size: 16px;
+}
+.arrow-btn:hover { border-color: var(--accent); color: var(--accent); }
+.arrow-btn:active { transform: scale(0.92); }
+
+/* HINT */
+.hint {
+  position: fixed; bottom: 36px; left: 48px; z-index: 100;
+  font-size: 10px; color: var(--muted); letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+  opacity: 1; transition: opacity 0.5s;
+}
+.hint.hidden { opacity: 0; }
+.key {
+  padding: 3px 7px; background: var(--card);
+  border: 1px solid var(--border); border-radius: 4px;
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  color: var(--text);
+}
+
+/* ─────────────────────────── SLIDE ATOMS ─────────────────────────── */
+.label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.big-title {
+  font-size: clamp(56px, 8.5vw, 120px);
+  font-weight: 900; line-height: 0.9;
+  letter-spacing: -0.04em; color: var(--white);
+  text-align: center;
+}
+.big-title .hl { color: var(--accent); }
+
+.sub {
+  font-size: clamp(16px, 2vw, 22px);
+  color: var(--muted); max-width: 640px;
+  text-align: center; line-height: 1.6;
+  margin-top: 24px;
+}
+
+/* SLIDE 1 — CAPA */
+#s0 .capa-content {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center; gap: 0;
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(200,241,53,0.1); border: 1px solid rgba(200,241,53,0.3);
+  color: var(--accent); font-size: 10px; font-weight: 700;
+  padding: 6px 16px; border-radius: 20px;
+  margin-bottom: 36px; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.badge-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
+
+.capa-line { display: block; }
+.capa-line.dim { color: rgba(255,255,255,0.15); }
+
+.capa-desc {
+  font-size: 18px; color: var(--muted); max-width: 520px;
+  line-height: 1.65; margin-top: 36px;
+}
+
+.bg-num {
+  position: absolute; right: -2vw; bottom: -8vh;
+  font-size: clamp(200px, 28vw, 380px); font-weight: 900;
+  color: rgba(200,241,53,0.025); line-height: 1;
+  user-select: none; pointer-events: none;
+  font-family: 'Space Mono', monospace;
+}
+
+/* SLIDE 2 — INÉRCIA */
+#s1 { background: var(--bg); }
+.inercia-layout {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 48px; align-items: center;
+  max-width: 1100px; width: 100%;
+}
+.inercia-left {}
+.inercia-title {
+  font-size: clamp(42px, 5.5vw, 72px);
+  font-weight: 900; line-height: 0.95;
+  letter-spacing: -0.03em; margin-bottom: 28px;
+}
+.inercia-desc {
+  font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 460px;
+}
+.inercia-right {
+  display: flex; flex-direction: column; gap: 14px;
+}
+.inercia-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px 28px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.3s;
+}
+.inercia-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: var(--item-col, var(--red));
+}
+.inercia-card-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px; color: var(--item-col, var(--red));
+  letter-spacing: 0.1em; margin-bottom: 6px;
+}
+.inercia-card-title {
+  font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 6px;
+}
+.inercia-card-sub { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+/* SLIDE 3 — TRÊS ENGRENAGENS */
+#s2 {}
+.tres-layout {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  align-items: center; max-width: 1100px; width: 100%;
+}
+.tres-title {
+  font-size: clamp(38px, 5vw, 64px);
+  font-weight: 900; letter-spacing: -0.03em;
+  color: var(--white); text-align: center; margin-bottom: 60px;
+  line-height: 1.0;
+}
+.tres-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; width: 100%;
+}
+.engrenagem {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 36px 28px;
+  display: flex; flex-direction: column; gap: 16px;
+  position: relative; overflow: hidden; cursor: default;
+  transition: transform 0.3s, border-color 0.3s;
+}
+.engrenagem:hover { transform: translateY(-6px); }
+.engrenagem::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 3px;
+  background: var(--eg-col, var(--accent));
+}
+.engrenagem-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 48px; font-weight: 700;
+  line-height: 1; opacity: 0.08;
+  color: var(--eg-col, var(--accent));
+  position: absolute; top: 20px; right: 24px;
+}
+.engrenagem-icon { font-size: 36px; }
+.engrenagem-name {
+  font-size: 20px; font-weight: 800; color: var(--white);
+  letter-spacing: -0.01em;
+}
+.engrenagem-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.engrenagem-tag {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 20px;
+  background: rgba(200,241,53,0.1); color: var(--eg-col, var(--accent));
+  width: fit-content;
+}
+
+/* SLIDE 4 — CANAIS */
+#s3 {}
+.canais-layout {
+  position: relative; z-index: 1;
+  max-width: 1100px; width: 100%;
+}
+.canais-header { margin-bottom: 48px; }
+.canais-title {
+  font-size: clamp(40px, 5.5vw, 70px);
+  font-weight: 900; letter-spacing: -0.03em; color: var(--white);
+  line-height: 0.95; margin-bottom: 16px;
+}
+.canais-title span { color: var(--accent); }
+.canais-sub { font-size: 16px; color: var(--muted); max-width: 560px; line-height: 1.6; }
+.canais-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.canal {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px 24px;
+  position: relative; overflow: hidden;
+}
+.canal-tag {
+  display: inline-block; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 4px; margin-bottom: 16px;
+}
+.canal-name { font-size: 22px; font-weight: 800; color: var(--white); margin-bottom: 6px; }
+.canal-slogan { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+.canal-items { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.canal-items li { font-size: 13px; display: flex; gap: 8px; color: var(--text); }
+.canal-items li::before { content: '→'; flex-shrink: 0; }
+.canal-bar {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+}
+
+/* SLIDE 5 — PROCESSO */
+#s4 {}
+.processo-layout {
+  position: relative; z-index: 1;
+  max-width: 1100px; width: 100%;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+}
+.processo-left {}
+.processo-title {
+  font-size: clamp(38px, 5vw, 62px);
+  font-weight: 900; letter-spacing: -0.03em; color: var(--white);
+  line-height: 0.95; margin-bottom: 20px;
+}
+.processo-title span { color: var(--accent); }
+.processo-desc { font-size: 16px; color: var(--muted); line-height: 1.7; margin-bottom: 32px; }
+.processo-stat {
+  display: flex; gap: 32px;
+}
+.p-stat-item {}
+.p-stat-val {
+  font-family: 'Space Mono', monospace;
+  font-size: 36px; font-weight: 700; color: var(--accent);
+  display: block; line-height: 1;
+}
+.p-stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; }
+
+.funil-visual {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.funil-step {
+  display: flex; align-items: center; gap: 14px;
+}
+.funil-bar-wrap { flex: 1; }
+.funil-bar-bg {
+  height: 36px; background: rgba(255,255,255,0.04);
+  border-radius: 6px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.funil-bar-fill {
+  height: 100%; border-radius: 6px;
+  display: flex; align-items: center; padding-left: 14px;
+  transition: width 1s ease;
+}
+.funil-bar-fill span { font-size: 12px; font-weight: 700; color: rgba(0,0,0,0.8); white-space: nowrap; }
+.funil-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; min-width: 100px; text-align: right; }
+.funil-count { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 36px; text-align: right; }
+.funil-arrow { text-align: center; font-size: 10px; color: var(--border); padding: 0 0 0 114px; }
+
+/* SLIDE 6 — OFERTA */
+#s5 {}
+.oferta-layout {
+  position: relative; z-index: 1;
+  max-width: 1100px; width: 100%;
+}
+.oferta-header { margin-bottom: 48px; }
+.oferta-title {
+  font-size: clamp(40px, 5.5vw, 70px);
+  font-weight: 900; letter-spacing: -0.03em; color: var(--white);
+  line-height: 0.95; margin-bottom: 16px;
+}
+.oferta-title span { color: var(--accent); }
+.oferta-sub { font-size: 16px; color: var(--muted); max-width: 560px; line-height: 1.6; }
+.oferta-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.oferta-el {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px 18px;
+  position: relative; overflow: hidden;
+  transition: transform 0.25s, border-color 0.25s;
+}
+.oferta-el:hover { transform: translateY(-4px); border-color: var(--el-col, var(--accent)); }
+.oferta-el::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: var(--el-col, var(--accent));
+}
+.oferta-el-ico { font-size: 26px; margin-bottom: 12px; }
+.oferta-el-name { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+.oferta-el-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* SLIDE 7 — FÓRMULA FINAL */
+#s6 {}
+.formula-layout {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  max-width: 900px;
+}
+.formula-eq {
+  display: flex; align-items: center; justify-content: center;
+  gap: 20px; flex-wrap: wrap; margin: 48px 0;
+}
+.feq-part {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px 28px; text-align: center;
+}
+.feq-val {
+  font-size: clamp(18px, 2.5vw, 26px); font-weight: 800;
+  display: block; line-height: 1.1;
+}
+.feq-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 6px; }
+.feq-op { font-size: 36px; font-weight: 200; color: var(--border); }
+.feq-result {
+  background: rgba(200,241,53,0.08);
+  border: 1px solid rgba(200,241,53,0.3) !important;
+}
+.feq-result .feq-val { color: var(--accent); }
+.formula-note { font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 600px; }
+
+/* SLIDE 8 — CTA / IG */
+#s7 {}
+.cta-layout {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+}
+.cta-big {
+  font-size: clamp(52px, 8vw, 108px);
+  font-weight: 900; line-height: 0.9;
+  letter-spacing: -0.04em; margin-bottom: 40px;
+}
+.cta-line1 { display: block; color: var(--white); }
+.cta-line2 { display: block; color: var(--accent); }
+.ig-block {
+  display: flex; align-items: center; gap: 20px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px 44px;
+  margin-bottom: 40px; cursor: pointer;
+  transition: all 0.3s;
+}
+.ig-block:hover { border-color: var(--accent); transform: translateY(-3px); }
+.ig-at { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; color: var(--accent); }
+.ig-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 4px; }
+.ig-icon { font-size: 44px; opacity: 0.6; }
+.cta-sub { font-size: 16px; color: var(--muted); max-width: 500px; line-height: 1.65; }
+
+/* SLIDE dot indicators */
+.dots {
+  position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 100;
+}
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--border); transition: all 0.3s; cursor: pointer;
+}
+.dot.active { background: var(--accent); width: 20px; border-radius: 3px; }
+
+/* Anim helpers */
+.slide .anim-item {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.slide.active .anim-item { opacity: 1; transform: translateY(0); }
+.slide.active .anim-item:nth-child(1) { transition-delay: 0.05s; }
+.slide.active .anim-item:nth-child(2) { transition-delay: 0.12s; }
+.slide.active .anim-item:nth-child(3) { transition-delay: 0.19s; }
+.slide.active .anim-item:nth-child(4) { transition-delay: 0.26s; }
+.slide.active .anim-item:nth-child(5) { transition-delay: 0.33s; }
+.slide.active .anim-item:nth-child(6) { transition-delay: 0.40s; }
+
+/* Glow orb */
+.glow-orb {
+  position: absolute; border-radius: 50%;
+  pointer-events: none; opacity: 0.06; filter: blur(80px);
+}
+
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Estruturação Comercial</div>
+  <div class="nav-counter" id="counter">01 / 08</div>
+</nav>
+
+<!-- PROGRESS -->
+<div class="progress-bar">
+  <div class="progress-fill" id="progress" style="width:12.5%"></div>
+</div>
+
+<!-- DOTS -->
+<div class="dots" id="dots"></div>
+
+<!-- ARROWS -->
+<div class="arrows">
+  <div class="arrow-btn" id="prev" onclick="navigate(-1)">←</div>
+  <div class="arrow-btn" id="next" onclick="navigate(1)">→</div>
+</div>
+
+<!-- HINT -->
+<div class="hint" id="hint">
+  <span class="key">←</span> <span class="key">→</span> navegar
+</div>
+
+<!-- DECK -->
+<div class="deck" id="deck">
+
+  <!-- ════════ SLIDE 0 — CAPA ════════ -->
+  <div class="slide active" id="s0">
+    <div class="grid-bg"></div>
+    <div class="noise"></div>
+    <div class="glow-orb" style="width:600px;height:600px;background:var(--accent);left:-100px;top:-100px;"></div>
+    <div class="bg-num">01</div>
+    <div class="capa-content">
+      <div class="badge anim-item"><span class="badge-dot"></span>Masterclass · Vendas B2B e B2C</div>
+      <h1 class="big-title anim-item">
+        <span class="capa-line">Estruturação</span>
+        <span class="capa-line hl">Comercial</span>
+      </h1>
+      <p class="capa-desc anim-item">
+        Do primeiro contato ao fechamento — entenda os três pilares que transformam esforço em processo e processo em crescimento previsível.
+      </p>
+    </div>
+  </div>
+
+  <!-- ════════ SLIDE 1 — CUSTO DE INÉRCIA ════════ -->
+  <div class="slide" id="s1">
+    <div class="grid-bg"></div>
+    <div class="noise"></div>
+    <div class="glow-orb" style="width:500px;height:500px;background:var(--red);right:-80px;bottom:-80px;"></div>
+    <div class="inercia-layout">
+      <div class="inercia-left">
+        <div class="label anim-item">O problema real</div>
+        <h2 class="inercia-title anim-item">
+          <span style="color:var(--red)">Custo</span><br>
+          <span style="color:var(--white)">de</span><br>
+          <span style="color:var(--white)">Inércia</span>
+        </h2>
+        <p class="inercia-desc anim-item">
+          Não estruturar seu comercial tem um custo invisível — mas crescente. Cada semana sem processo é uma semana que você depende de sorte, talento individual ou indicações que não controlamos.
+        </p>
+      </div>
+      <div class="inercia-right">
+        <div class="inercia-card anim-item" style="--item-col:#EF4444">
+          <div class="inercia-card-num">01 — SINTOMA</div>
+          <div class="inercia-card-title">Vendas dependem de uma pessoa</div>
+          <div class="inercia-card-sub">Se o seu melhor vendedor sair hoje, seu faturamento cai. Isso é processo inexistente.</div>
+        </div>
+        <div class="inercia-card anim-item" style="--item-col:#F97316">
+          <div class="inercia-card-num">02 — SINTOMA</div>
+          <div class="inercia-card-title">Não sabe de onde vêm os clientes</div>
+          <div class="inercia-card-sub">Sem rastrear canais, você investe no escuro e não consegue escalar o que funciona.</div>
+        </div>
+        <div class="inercia-card anim-item" style="--item-col:#EAB308">
+          <div class="inercia-card-num">03 — SINTOMA</div>
+          <div class="inercia-card-title">O preço sempre "tá caro"</div>
+          <div class="inercia-card-sub">Quando o cliente foca no preço, é porque você ainda não construiu valor antes de revelar o número.</div>
+        </div>
+        <div class="inercia-card anim-item" style="--item-col:#22C55E">
+          <div class="inercia-card-num">A SOLUÇÃO</div>
+          <div class="inercia-card-title">Três engrenagens que mudam tudo</div>
+          <div class="inercia-card-sub">Canais + Processo + Oferta. Juntos, eles formam uma operação comercial independente de sorte.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ SLIDE 2 — TRÊS ENGRENAGENS ════════ -->
+  <div class="slide" id="s2">
+    <div class="grid-bg"></div>
+    <div class="noise"></div>
+    <div class="tres-layout">
+      <h2 class="tres-title anim-item">
+        As três <span style="color:var(--accent)">engrenagens</span><br>do comercial
+      </h2>
+      <div class="tres-grid">
+        <div class="engrenagem anim-item" style="--eg-col:var(--accent)">
+          <div class="engrenagem-num">01</div>
+          <div class="engrenagem-icon">📡</div>
+          <div class="engrenagem-name">Canais de Aquisição</div>
+          <div class="engrenagem-desc">De onde vêm seus clientes? Inbound, Outbound ou Parcerias — cada canal tem lógica própria e taxas distintas.</div>
+          <div class="engrenagem-tag">Aula 01</div>
+        </div>
+        <div class="engrenagem anim-item" style="--eg-col:var(--purple)">
+          <div class="engrenagem-num">02</div>
+          <div class="engrenagem-icon">⚙️</div>
+          <div class="engrenagem-name">Processo Comercial</div>
+          <div class="engrenagem-desc">Como um lead vira cliente? 7 etapas, micro-taxas mensuráveis e um funil que funciona sem improviso.</div>
+          <div class="engrenagem-tag" style="background:rgba(139,92,246,0.12);color:var(--purple)">Aula 02</div>
+        </div>
+        <div class="engrenagem anim-item" style="--eg-col:var(--orange)">
+          <div class="engrenagem-num">03</div>
+          <div class="engrenagem-icon">🎯</div>
+          <div class="engrenagem-name">Construção de Oferta</div>
+          <div class="engrenagem-desc">O que o cliente compra? Não é seu produto — é a transformação. E isso se constrói com estrutura.</div>
+          <div class="engrenagem-tag" style="background:rgba(249,115,22,0.12);color:var(--orange)">Aula 03</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ SLIDE 3 — CANAIS DE AQUISIÇÃO ════════ -->
+  <div class="slide" id="s3">
+    <div class="grid-bg"></div>
+    <div class="noise"></div>
+    <div class="glow-orb" style="width:400px;height:400px;background:var(--accent);left:-60px;top:40px;"></div>
+    <div class="canais-layout">
+      <div class="canais-header">
+        <div class="label anim-item">Engrenagem 01</div>
+        <h2 class="canais-title anim-item">Canais de <span>Aquisição</span></h2>
+        <p class="canais-sub anim-item">Canal é qualquer meio pelo qual um cliente descobre sua empresa. Escolher errado custa caro. Escolher certo é vantagem competitiva.</p>
+      </div>
+      <div class="canais-grid anim-item">
+        <div class="canal">
+          <div class="canal-tag" style="background:rgba(200,241,53,0.12);color:var(--accent)">Chegada Espontânea</div>
+          <div class="canal-name">Inbound</div>
+          <div class="canal-slogan">O cliente chega até você.</div>
+          <ul class="canal-items">
+            <li style="color:var(--text)">Conteúdo orgânico e autoridade</li>
+            <li style="color:var(--text)">Redes sociais e marca pessoal</li>
+            <li style="color:var(--text)">Indicações e boca a boca</li>
+            <li style="color:var(--muted)">Custo cai com o tempo</li>
+          </ul>
+          <div class="canal-bar" style="background:var(--accent)"></div>
+        </div>
+        <div class="canal">
+          <div class="canal-tag" style="background:rgba(139,92,246,0.12);color:var(--purple)">Prospecção Ativa</div>
+          <div class="canal-name">Outbound</div>
+          <div class="canal-slogan">Você vai até o cliente.</div>
+          <ul class="canal-items">
+            <li style="color:var(--text)">Cold email e cold call</li>
+            <li style="color:var(--text)">LinkedIn e social selling</li>
+            <li style="color:var(--text)">Eventos e networking</li>
+            <li style="color:var(--muted)">Resultados mais rápidos</li>
+          </ul>
+          <div class="canal-bar" style="background:var(--purple)"></div>
+        </div>
+        <div class="canal">
+          <div class="canal-tag" style="background:rgba(249,115,22,0.12);color:var(--orange)">Terceiros Indicam</div>
+          <div class="canal-name">Parcerias</div>
+          <div class="canal-slogan">Alguém te apresenta.</div>
+          <ul class="canal-items">
+            <li style="color:var(--text)">Programas de indicação</li>
+            <li style="color:var(--text)">Co-marketing e afiliados</li>
+            <li style="color:var(--text)">Canais de revenda</li>
+            <li style="color:var(--muted)">Custo baixo, dependência alta</li>
+          </ul>
+          <div class="canal-bar" style="background:var(--orange)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ SLIDE 4 — PROCESSO COMERCIAL ════════ -->
+  <div class="slide" id="s4">
+    <div class="grid-bg"></div>
+    <div class="noise"></div>
+    <div class="glow-orb" style="width:450px;height:450px;background:var(--purple);right:-60px;top:60px;"></div>
+    <div class="processo-layout">
+      <div class="processo-left">
+        <div class="label anim-item">Engrenagem 02</div>
+        <h2 class="processo-title anim-item">Processo <span>Comercial</span></h2>
+        <p class="processo-desc anim-item">Uma sequência de etapas que transforma um lead frio em cliente — de forma sistemática, mensurável e escalável.</p>
+        <div class="processo-stat anim-item">
+          <div class="p-stat-item">
+            <span class="p-stat-val">7</span>
+            <span class="p-stat-label">Etapas</span>
+          </div>
+          <div class="p-stat-item">
+            <span class="p-stat-val">5×</span>
+            <span class="p-stat-label">Micro-taxas</span>
+          </div>
+          <div class="p-stat-item">
+            <span class="p-stat-val">∞</span>
+            <span class="p-stat-label">Escalável</span>
+          </div>
+        </div>
+      </div>
+      <div class="funil-visual anim-item">
+        <div class="funil-step">
+          <div class="funil-label">Abordagem</div>
+          <div class="funil-bar-wrap">
+            <div class="funil-bar-bg">
+              <div class="funil-bar-fill" style="width:100%;background:var(--accent)"><span>1.000 leads</span></div>
+            </div>
+          </div>
+          <div class="funil-count" style="color:var(--accent)">100%</div>
+        </div>
+        <div class="funil-arrow">↓ 40%</div>
+        <div class="funil-step">
+          <div class="funil-label">Apresentação</div>
+          <div class="funil-bar-wrap">
+            <div class="funil-bar-bg">
+              <div class="funil-bar-fill" style="width:40%;background:var(--blue)"><span>400</span></div>
+            </div>
+          </div>
+          <div class="funil-count" style="color:var(--blue)">40%</div>
+        </div>
+        <div class="funil-arrow">↓ 65%</div>
+        <div class="funil-step">
+          <div class="funil-label">Relacionamento</div>
+          <div class="funil-bar-wrap">
+            <div class="funil-bar-bg">
+              <div class="funil-bar-fill" style="width:26%;background:var(--purple)"><span>260</span></div>
+            </div>
+          </div>
+          <div class="funil-count" style="color:var(--purple)">26%</div>
+        </div>
+        <div class="funil-arrow">↓ 75%</div>
+        <div class="funil-step">
+          <div class="funil-label">Negociação</div>
+          <div class="funil-bar-wrap">
+            <div class="funil-bar-bg">
+              <div class="funil-bar-fill" style="width:11%;background:var(--orange)"><span>107</span></div>
+            </div>
+          </div>
+          <div class="funil-count" style="color:var(--orange)">11%</div>
+        </div>
+        <div class="funil-arrow">↓ 35%</div>
+        <div class="funil-step">
+          <div class="funil-label" style="color:var(--green);font-weight:700">✓ Fechados</div>
+          <div class="funil-bar-wrap">
+            <div class="funil-bar-bg">
+              <div class="funil-bar-fill" style="width:4%;background:var(--green);min-width:60px"><span>37</span></div>
+            </div>
+          </div>
+          <div class="funil-count" style="color:var(--green);font-weight:800">3,7%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ SLIDE 5 — CONSTRUÇÃO DE OFERTA ════════ -->
+  <div class="slide" id="s5">
+    <div class="grid-bg"></div>
+    <div class="noise"></div>
+    <div class="glow-orb" style="width:400px;height:400px;background:var(--orange);right:-60px;bottom:-60px;"></div>
+    <div class="oferta-layout">
+      <div class="oferta-header">
+        <div class="label anim-item">Engrenagem 03</div>
+        <h2 class="oferta-title anim-item">Construção de <span>Oferta</span></h2>
+        <p class="oferta-sub anim-item">Pare de vender o que você faz. Comece a vender o que o cliente ganha. Uma oferta irresistível tem estrutura — não improviso.</p>
+      </div>
+      <div class="oferta-grid anim-item">
+        <div class="oferta-el" style="--el-col:var(--accent)">
+          <div class="oferta-el-ico">🎯</div>
+          <div class="oferta-el-name">Resultado Prometido</div>
+          <div class="oferta-el-desc">Específico, mensurável e com prazo. O "depois" que o cliente compra.</div>
+        </div>
+        <div class="oferta-el" style="--el-col:var(--blue)">
+          <div class="oferta-el-ico">⏱️</div>
+          <div class="oferta-el-name">Prazo de Entrega</div>
+          <div class="oferta-el-desc">Promessa sem prazo é vaga. O prazo cria urgência e credibilidade.</div>
+        </div>
+        <div class="oferta-el" style="--el-col:var(--purple)">
+          <div class="oferta-el-ico">🛡️</div>
+          <div class="oferta-el-name">Redução de Risco</div>
+          <div class="oferta-el-desc">Garantia sólida. Quem assume o risco fecha mais — sempre.</div>
+        </div>
+        <div class="oferta-el" style="--el-col:var(--orange)">
+          <div class="oferta-el-ico">🧩</div>
+          <div class="oferta-el-name">Facilidade</div>
+          <div class="oferta-el-desc">Quanto menos esforço o cliente coloca, maior o valor percebido.</div>
+        </div>
+        <div class="oferta-el" style="--el-col:var(--green)">
+          <div class="oferta-el-ico">📦</div>
+          <div class="oferta-el-name">Bônus e Extras</div>
+          <div class="oferta-el-desc">Elementos que multiplicam o valor percebido sem aumentar o custo.</div>
+        </div>
+        <div class="oferta-el" style="--el-col:var(--yellow,#EAB308)">
+          <div class="oferta-el-ico">⚡</div>
+          <div class="oferta-el-name">Urgência Real</div>
+          <div class="oferta-el-desc">Motivo genuíno para decidir agora — não um gatilho falso.</div>
+        </div>
+        <div class="oferta-el" style="--el-col:#EC4899">
+          <div class="oferta-el-ico">🏆</div>
+          <div class="oferta-el-name">Prova Social</div>
+          <div class="oferta-el-desc">Cases com resultados numéricos. Quanto mais específico, mais convence.</div>
+        </div>
+        <div class="oferta-el" style="--el-col:var(--red)">
+          <div class="oferta-el-ico">💰</div>
+          <div class="oferta-el-name">Preço por Último</div>
+          <div class="oferta-el-desc">Preço vem depois do valor. Nunca antes. Essa ordem muda tudo.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ SLIDE 6 — FÓRMULA ════════ -->
+  <div class="slide" id="s6">
+    <div class="grid-bg"></div>
+    <div class="noise"></div>
+    <div class="glow-orb" style="width:700px;height:700px;background:var(--accent);left:50%;top:50%;transform:translate(-50%,-50%);"></div>
+    <div class="formula-layout">
+      <div class="label anim-item">A síntese</div>
+      <h2 class="big-title anim-item" style="font-size:clamp(42px,6vw,82px)">
+        A equação do<br><span class="hl">crescimento previsível</span>
+      </h2>
+      <div class="formula-eq anim-item">
+        <div class="feq-part">
+          <span class="feq-val" style="color:var(--accent)">Canais<br>Certos</span>
+          <span class="feq-label">de onde vêm</span>
+        </div>
+        <div class="feq-op">+</div>
+        <div class="feq-part">
+          <span class="feq-val" style="color:var(--purple)">Processo<br>Claro</span>
+          <span class="feq-label">como avançam</span>
+        </div>
+        <div class="feq-op">+</div>
+        <div class="feq-part">
+          <span class="feq-val" style="color:var(--orange)">Oferta<br>Irresistível</span>
+          <span class="feq-label">por que compram</span>
+        </div>
+        <div class="feq-op">=</div>
+        <div class="feq-part feq-result">
+          <span class="feq-val">Operação<br>Escalável</span>
+          <span class="feq-label">crescimento previsível</span>
+        </div>
+      </div>
+      <p class="formula-note anim-item">
+        Com as três engrenagens funcionando juntas, você para de depender de sorte ou de pessoas específicas — e começa a ter um sistema que gera resultados independente de quem está vendendo.
+      </p>
+    </div>
+  </div>
+
+  <!-- ════════ SLIDE 7 — CTA / IG ════════ -->
+  <div class="slide" id="s7">
+    <div class="grid-bg"></div>
+    <div class="noise"></div>
+    <div class="glow-orb" style="width:600px;height:600px;background:var(--accent);left:50%;top:50%;transform:translate(-50%,-50%);"></div>
+    <div class="bg-num" style="right:auto;left:-2vw;bottom:-6vh;opacity:0.015">FIM</div>
+    <div class="cta-layout">
+      <div class="badge anim-item"><span class="badge-dot"></span>Continue aprendendo</div>
+      <h2 class="cta-big anim-item">
+        <span class="cta-line1">Quer ir</span>
+        <span class="cta-line2">mais fundo?</span>
+      </h2>
+      <div class="ig-block anim-item" onclick="window.open('https://www.instagram.com/gustavoobenedetti','_blank')">
+        <div>
+          <div class="ig-at">@gustavoobenedetti</div>
+          <div class="ig-label">Instagram · Conteúdo sobre Vendas</div>
+        </div>
+        <div class="ig-icon">📲</div>
+      </div>
+      <p class="cta-sub anim-item">
+        Conteúdo prático sobre estruturação comercial, processo de vendas e construção de oferta — todo dia no Instagram.
+      </p>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<script>
+const TOTAL = 8;
+let current = 0;
+let isAnimating = false;
+
+// Cursor
+const cursorEl = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursorEl.style.left = e.clientX + 'px';
+  cursorEl.style.top = e.clientY + 'px';
+});
+
+// Build dots
+const dotsEl = document.getElementById('dots');
+for (let i = 0; i < TOTAL; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.onclick = () => goTo(i);
+  dotsEl.appendChild(d);
+}
+
+function goTo(target) {
+  if (isAnimating || target === current) return;
+  if (target < 0 || target >= TOTAL) return;
+  isAnimating = true;
+
+  const dir = target > current ? 1 : -1;
+  const slides = document.querySelectorAll('.slide');
+  const from = slides[current];
+  const to = slides[target];
+
+  from.classList.remove('active');
+  from.classList.add(dir > 0 ? 'exit-left' : 'exit-right');
+
+  to.style.transform = dir > 0 ? 'translateX(60px)' : 'translateX(-60px)';
+  to.style.opacity = '0';
+  to.style.pointerEvents = 'none';
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      to.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+      to.style.transform = 'translateX(0)';
+      to.style.opacity = '1';
+      to.style.pointerEvents = 'all';
+      to.classList.add('active');
+
+      setTimeout(() => {
+        from.classList.remove('exit-left', 'exit-right');
+        to.style.transition = '';
+        to.style.transform = '';
+        to.style.opacity = '';
+        isAnimating = false;
+      }, 480);
+    });
+  });
+
+  current = target;
+  updateUI();
+}
+
+function navigate(dir) { goTo(current + dir); }
+
+function updateUI() {
+  document.getElementById('counter').textContent =
+    String(current + 1).padStart(2, '0') + ' / ' + String(TOTAL).padStart(2, '0');
+  document.getElementById('progress').style.width = ((current + 1) / TOTAL * 100) + '%';
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i === current);
+  });
+  // hide hint after first nav
+  if (current > 0) document.getElementById('hint').classList.add('hidden');
+}
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+    e.preventDefault(); navigate(1);
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault(); navigate(-1);
+  } else if (e.key === 'Home') {
+    goTo(0);
+  } else if (e.key === 'End') {
+    goTo(TOTAL - 1);
+  }
+});
+
+// Touch swipe
+let touchX = 0;
+document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 50) navigate(dx < 0 ? 1 : -1);
+}, { passive: true });
+
+updateUI();
+</script>
+</body>
+</html>
