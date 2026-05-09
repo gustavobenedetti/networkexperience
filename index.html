@@ -33,7 +33,6 @@ body {
   cursor: none;
 }
 
-/* CURSOR */
 .cursor {
   position: fixed; width: 10px; height: 10px;
   background: var(--accent); border-radius: 50%;
@@ -43,10 +42,8 @@ body {
   mix-blend-mode: difference;
 }
 
-/* DECK */
 .deck { width: 100vw; height: 100vh; position: relative; }
 
-/* SLIDES */
 .slide {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
@@ -61,14 +58,9 @@ body {
 .slide.active {
   opacity: 1; pointer-events: all; transform: translateX(0);
 }
-.slide.exit-left {
-  opacity: 0; transform: translateX(-60px);
-}
-.slide.exit-right {
-  opacity: 0; transform: translateX(60px);
-}
+.slide.exit-left { opacity: 0; transform: translateX(-60px); }
+.slide.exit-right { opacity: 0; transform: translateX(60px); }
 
-/* GRID BG */
 .grid-bg {
   position: absolute; inset: 0; pointer-events: none; overflow: hidden;
   background-image:
@@ -79,13 +71,11 @@ body {
 }
 @keyframes gridDrift { 0%{transform:translateY(0)} 100%{transform:translateY(70px)} }
 
-/* NOISE */
 .noise {
   position: absolute; inset: 0; pointer-events: none; opacity: 0.025;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* NAV */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   padding: 24px 48px;
@@ -101,7 +91,6 @@ nav {
   letter-spacing: 0.1em;
 }
 
-/* PROGRESS */
 .progress-bar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
   height: 2px; background: var(--border);
@@ -112,7 +101,6 @@ nav {
   box-shadow: 0 0 12px var(--accent);
 }
 
-/* ARROWS */
 .arrows {
   position: fixed; bottom: 32px; right: 48px; z-index: 100;
   display: flex; gap: 8px;
@@ -127,7 +115,6 @@ nav {
 .arrow-btn:hover { border-color: var(--accent); color: var(--accent); }
 .arrow-btn:active { transform: scale(0.92); }
 
-/* HINT */
 .hint {
   position: fixed; bottom: 36px; left: 48px; z-index: 100;
   font-size: 10px; color: var(--muted); letter-spacing: 0.12em;
@@ -143,7 +130,6 @@ nav {
   color: var(--text);
 }
 
-/* ─────────────────────────── SLIDE ATOMS ─────────────────────────── */
 .label {
   font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
   text-transform: uppercase; color: var(--accent);
@@ -158,19 +144,6 @@ nav {
 }
 .big-title .hl { color: var(--accent); }
 
-.sub {
-  font-size: clamp(16px, 2vw, 22px);
-  color: var(--muted); max-width: 640px;
-  text-align: center; line-height: 1.6;
-  margin-top: 24px;
-}
-
-/* SLIDE 1 — CAPA */
-#s0 .capa-content {
-  position: relative; z-index: 1;
-  display: flex; flex-direction: column;
-  align-items: center; text-align: center; gap: 0;
-}
 .badge {
   display: inline-flex; align-items: center; gap: 8px;
   background: rgba(200,241,53,0.1); border: 1px solid rgba(200,241,53,0.3);
@@ -200,48 +173,68 @@ nav {
   font-family: 'Space Mono', monospace;
 }
 
-/* SLIDE 2 — INÉRCIA */
-#s1 { background: var(--bg); }
-.inercia-layout {
+.glow-orb {
+  position: absolute; border-radius: 50%;
+  pointer-events: none; opacity: 0.06; filter: blur(80px);
+}
+
+.dots {
+  position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 100;
+}
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--border); transition: all 0.3s; cursor: pointer;
+}
+.dot.active { background: var(--accent); width: 20px; border-radius: 3px; }
+
+.slide .anim-item {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.slide.active .anim-item { opacity: 1; transform: translateY(0); }
+.slide.active .anim-item:nth-child(1) { transition-delay: 0.05s; }
+.slide.active .anim-item:nth-child(2) { transition-delay: 0.12s; }
+.slide.active .anim-item:nth-child(3) { transition-delay: 0.19s; }
+.slide.active .anim-item:nth-child(4) { transition-delay: 0.26s; }
+.slide.active .anim-item:nth-child(5) { transition-delay: 0.33s; }
+.slide.active .anim-item:nth-child(6) { transition-delay: 0.40s; }
+
+/* ─── SLIDE 0 — CAPA ─── */
+#s0 .capa-content {
   position: relative; z-index: 1;
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 48px; align-items: center;
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center; gap: 0;
+}
+
+/* ─── SLIDE 1 — GRÁFICO CRESCIMENTO ─── */
+#s1 .chart-layout {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: 1fr 1.4fr;
+  gap: 60px; align-items: center;
   max-width: 1100px; width: 100%;
 }
-.inercia-left {}
-.inercia-title {
-  font-size: clamp(42px, 5.5vw, 72px);
-  font-weight: 900; line-height: 0.95;
-  letter-spacing: -0.03em; margin-bottom: 28px;
+.chart-left-title {
+  font-size: clamp(38px, 5vw, 62px);
+  font-weight: 900; line-height: 0.95; letter-spacing: -0.03em;
+  margin-bottom: 20px;
 }
-.inercia-desc {
-  font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 460px;
-}
-.inercia-right {
-  display: flex; flex-direction: column; gap: 14px;
-}
-.inercia-card {
+.chart-left-desc { font-size: 16px; color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
+.chart-milestones { display: flex; flex-direction: column; gap: 10px; }
+.milestone {
+  display: flex; align-items: center; gap: 12px;
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 22px 28px;
-  position: relative; overflow: hidden;
-  transition: border-color 0.3s;
+  border-radius: 10px; padding: 12px 18px;
 }
-.inercia-card::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-  width: 3px; background: var(--item-col, var(--red));
-}
-.inercia-card-num {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px; color: var(--item-col, var(--red));
-  letter-spacing: 0.1em; margin-bottom: 6px;
-}
-.inercia-card-title {
-  font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 6px;
-}
-.inercia-card-sub { font-size: 13px; color: var(--muted); line-height: 1.55; }
+.milestone-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.milestone-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; flex: 1; }
+.milestone-val { font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; }
 
-/* SLIDE 3 — TRÊS ENGRENAGENS */
-#s2 {}
+.chart-area { position: relative; }
+#growth-chart { width: 100%; height: 320px; }
+
+/* ─── SLIDE 2 — TRÊS ENGRENAGENS ─── */
+#s2 { }
 .tres-layout {
   position: relative; z-index: 1;
   display: flex; flex-direction: column;
@@ -250,49 +243,59 @@ nav {
 .tres-title {
   font-size: clamp(38px, 5vw, 64px);
   font-weight: 900; letter-spacing: -0.03em;
-  color: var(--white); text-align: center; margin-bottom: 60px;
+  color: var(--white); text-align: center; margin-bottom: 48px;
   line-height: 1.0;
 }
-.tres-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 16px; width: 100%;
+.gears-container {
+  display: flex; align-items: center; justify-content: center; gap: 52px;
+  width: 100%;
 }
-.engrenagem {
+.gear-item {
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+}
+.gear-name {
+  font-size: 12px; font-weight: 700; color: var(--white);
+  letter-spacing: 0.12em; text-align: center; text-transform: uppercase;
+}
+.gear-svg-wrap { position: relative; }
+
+/* SVG gear animations */
+.gear-rotate-cw  { animation: rotateCW  7s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
+.gear-rotate-ccw { animation: rotateCCW 9s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
+.gear-rotate-cw2 { animation: rotateCW 11s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
+@keyframes rotateCW  { from{transform:rotate(0deg)}   to{transform:rotate(360deg)} }
+@keyframes rotateCCW { from{transform:rotate(0deg)}   to{transform:rotate(-360deg)} }
+
+.engrenagens-cards {
+  display: flex; flex-direction: row; align-items: flex-start;
+  justify-content: center; gap: 24px; width: 100%;
+}
+.eng-card {
+  flex: 1; max-width: 300px;
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 16px; padding: 36px 28px;
-  display: flex; flex-direction: column; gap: 16px;
-  position: relative; overflow: hidden; cursor: default;
-  transition: transform 0.3s, border-color 0.3s;
+  border-radius: 16px; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center;
+  padding-bottom: 32px;
 }
-.engrenagem:hover { transform: translateY(-6px); }
-.engrenagem::after {
-  content: ''; position: absolute;
-  bottom: 0; left: 0; right: 0; height: 3px;
-  background: var(--eg-col, var(--accent));
+.eng-topbar { width: 100%; height: 3px; flex-shrink: 0; }
+.eng-icon-wrap {
+  width: 80px; height: 80px; border-radius: 18px;
+  border: 1px solid; display: flex; align-items: center; justify-content: center;
+  margin: 32px 0 20px;
 }
-.engrenagem-num {
+.eng-num {
   font-family: 'Space Mono', monospace;
-  font-size: 48px; font-weight: 700;
-  line-height: 1; opacity: 0.08;
-  color: var(--eg-col, var(--accent));
-  position: absolute; top: 20px; right: 24px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+  margin-bottom: 12px;
 }
-.engrenagem-icon { font-size: 36px; }
-.engrenagem-name {
-  font-size: 20px; font-weight: 800; color: var(--white);
-  letter-spacing: -0.01em;
-}
-.engrenagem-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
-.engrenagem-tag {
-  display: inline-block; font-size: 10px; font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  padding: 4px 12px; border-radius: 20px;
-  background: rgba(200,241,53,0.1); color: var(--eg-col, var(--accent));
-  width: fit-content;
+.eng-title {
+  font-size: 18px; font-weight: 800; color: var(--white);
+  text-align: center; line-height: 1.2;
 }
 
-/* SLIDE 4 — CANAIS */
-#s3 {}
+.gear-connector { font-size: 28px; color: var(--border); padding: 0 8px; margin-top: -40px; }
+
+/* ─── SLIDE 3 — CANAIS ─── */
 .canais-layout {
   position: relative; z-index: 1;
   max-width: 1100px; width: 100%;
@@ -321,64 +324,53 @@ nav {
 .canal-items { list-style: none; display: flex; flex-direction: column; gap: 8px; }
 .canal-items li { font-size: 13px; display: flex; gap: 8px; color: var(--text); }
 .canal-items li::before { content: '→'; flex-shrink: 0; }
-.canal-bar {
-  position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
-}
+.canal-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
 
-/* SLIDE 5 — PROCESSO */
-#s4 {}
+/* ─── SLIDE 4 — PROCESSO COMERCIAL ─── */
 .processo-layout {
   position: relative; z-index: 1;
   max-width: 1100px; width: 100%;
   display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
 }
-.processo-left {}
 .processo-title {
-  font-size: clamp(38px, 5vw, 62px);
+  font-size: clamp(32px, 4vw, 52px);
   font-weight: 900; letter-spacing: -0.03em; color: var(--white);
-  line-height: 0.95; margin-bottom: 20px;
+  line-height: 0.95; margin-bottom: 16px;
 }
 .processo-title span { color: var(--accent); }
-.processo-desc { font-size: 16px; color: var(--muted); line-height: 1.7; margin-bottom: 32px; }
-.processo-stat {
-  display: flex; gap: 32px;
-}
-.p-stat-item {}
-.p-stat-val {
-  font-family: 'Space Mono', monospace;
-  font-size: 36px; font-weight: 700; color: var(--accent);
-  display: block; line-height: 1;
-}
-.p-stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; }
+.processo-desc { font-size: 15px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
 
-.funil-visual {
-  display: flex; flex-direction: column; gap: 8px;
+.conversion-formula {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px 20px;
 }
-.funil-step {
-  display: flex; align-items: center; gap: 14px;
-}
-.funil-bar-wrap { flex: 1; }
-.funil-bar-bg {
-  height: 36px; background: rgba(255,255,255,0.04);
-  border-radius: 6px; overflow: hidden;
-  border: 1px solid var(--border);
-}
-.funil-bar-fill {
-  height: 100%; border-radius: 6px;
-  display: flex; align-items: center; padding-left: 14px;
-  transition: width 1s ease;
-}
-.funil-bar-fill span { font-size: 12px; font-weight: 700; color: rgba(0,0,0,0.8); white-space: nowrap; }
-.funil-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; min-width: 100px; text-align: right; }
-.funil-count { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 36px; text-align: right; }
-.funil-arrow { text-align: center; font-size: 10px; color: var(--border); padding: 0 0 0 114px; }
+.conv-label { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+.conv-eq { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text); line-height: 1.8; }
+.conv-eq .hl { color: var(--accent); }
+.conv-eq .muted { color: var(--muted); }
 
-/* SLIDE 6 — OFERTA */
-#s5 {}
-.oferta-layout {
-  position: relative; z-index: 1;
-  max-width: 1100px; width: 100%;
+.etapas-list { display: flex; flex-direction: column; gap: 6px; }
+.etapa {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 16px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s;
 }
+.etapa:hover { border-color: var(--etapa-col, var(--accent)); }
+.etapa::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; background: var(--etapa-col, var(--accent));
+}
+.etapa-num {
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  color: var(--muted); min-width: 20px;
+}
+.etapa-name { font-size: 13px; font-weight: 700; color: var(--white); flex: 1; }
+.etapa-pct { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; }
+
+/* ─── SLIDE 5 — OFERTA ─── */
+.oferta-layout { position: relative; z-index: 1; max-width: 1100px; width: 100%; }
 .oferta-header { margin-bottom: 48px; }
 .oferta-title {
   font-size: clamp(40px, 5.5vw, 70px);
@@ -404,7 +396,7 @@ nav {
 .oferta-el-name { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
 .oferta-el-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
 
-/* SLIDE 7 — FÓRMULA FINAL */
+/* ─── SLIDE 6 — FÓRMULA ANIMADA ─── */
 #s6 {}
 .formula-layout {
   position: relative; z-index: 1;
@@ -414,114 +406,111 @@ nav {
 }
 .formula-eq {
   display: flex; align-items: center; justify-content: center;
-  gap: 20px; flex-wrap: wrap; margin: 48px 0;
+  gap: 16px; flex-wrap: wrap; margin: 40px 0;
 }
 .feq-part {
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 20px 28px; text-align: center;
+  border-radius: 12px; padding: 20px 24px; text-align: center;
+  animation: floatCard 4s ease-in-out infinite;
 }
+.feq-part:nth-child(1) { animation-delay: 0s; }
+.feq-part:nth-child(3) { animation-delay: 0.8s; }
+.feq-part:nth-child(5) { animation-delay: 1.6s; }
+.feq-part:nth-child(7) { animation-delay: 2.4s; }
+
+@keyframes floatCard {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
 .feq-val {
-  font-size: clamp(18px, 2.5vw, 26px); font-weight: 800;
+  font-size: clamp(16px, 2.2vw, 22px); font-weight: 800;
   display: block; line-height: 1.1;
 }
 .feq-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 6px; }
-.feq-op { font-size: 36px; font-weight: 200; color: var(--border); }
+.feq-op {
+  font-size: 32px; font-weight: 200; color: var(--border);
+  animation: opPulse 2s ease-in-out infinite;
+}
+@keyframes opPulse { 0%,100%{opacity:0.4} 50%{opacity:1; color: var(--accent);} }
+
 .feq-result {
   background: rgba(200,241,53,0.08);
   border: 1px solid rgba(200,241,53,0.3) !important;
+  animation: resultGlow 3s ease-in-out infinite !important;
 }
 .feq-result .feq-val { color: var(--accent); }
+@keyframes resultGlow {
+  0%,100% { box-shadow: 0 0 0 0 rgba(200,241,53,0); transform: translateY(0); }
+  50% { box-shadow: 0 0 40px 4px rgba(200,241,53,0.15); transform: translateY(-8px); }
+}
 .formula-note { font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 600px; }
 
-/* SLIDE 8 — CTA / IG */
-#s7 {}
+/* ─── SLIDE 7 — CTA / IG ─── */
 .cta-layout {
   position: relative; z-index: 1;
   display: flex; flex-direction: column;
   align-items: center; text-align: center;
 }
 .cta-big {
-  font-size: clamp(52px, 8vw, 108px);
-  font-weight: 900; line-height: 0.9;
-  letter-spacing: -0.04em; margin-bottom: 40px;
+  font-size: clamp(40px, 6vw, 80px);
+  font-weight: 900; line-height: 0.95;
+  letter-spacing: -0.04em; margin-bottom: 36px;
 }
 .cta-line1 { display: block; color: var(--white); }
 .cta-line2 { display: block; color: var(--accent); }
+
+.cta-bottom {
+  display: flex; align-items: center; gap: 40px;
+  margin-bottom: 32px;
+}
+
 .ig-block {
   display: flex; align-items: center; gap: 20px;
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 16px; padding: 28px 44px;
-  margin-bottom: 40px; cursor: pointer;
-  transition: all 0.3s;
+  border-radius: 16px; padding: 24px 36px;
+  cursor: pointer; transition: all 0.3s;
 }
 .ig-block:hover { border-color: var(--accent); transform: translateY(-3px); }
-.ig-at { font-family: 'Space Mono', monospace; font-size: 28px; font-weight: 700; color: var(--accent); }
-.ig-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 4px; }
-.ig-icon { font-size: 44px; opacity: 0.6; }
-.cta-sub { font-size: 16px; color: var(--muted); max-width: 500px; line-height: 1.65; }
+.ig-at { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--accent); }
+.ig-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 4px; }
+.ig-icon { font-size: 36px; opacity: 0.6; }
 
-/* SLIDE dot indicators */
-.dots {
-  position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
-  display: flex; gap: 8px; z-index: 100;
+.qr-block {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
 }
-.dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--border); transition: all 0.3s; cursor: pointer;
-}
-.dot.active { background: var(--accent); width: 20px; border-radius: 3px; }
+.qr-block canvas { border-radius: 8px; }
+.qr-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
 
-/* Anim helpers */
-.slide .anim-item {
-  opacity: 0; transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.slide.active .anim-item { opacity: 1; transform: translateY(0); }
-.slide.active .anim-item:nth-child(1) { transition-delay: 0.05s; }
-.slide.active .anim-item:nth-child(2) { transition-delay: 0.12s; }
-.slide.active .anim-item:nth-child(3) { transition-delay: 0.19s; }
-.slide.active .anim-item:nth-child(4) { transition-delay: 0.26s; }
-.slide.active .anim-item:nth-child(5) { transition-delay: 0.33s; }
-.slide.active .anim-item:nth-child(6) { transition-delay: 0.40s; }
-
-/* Glow orb */
-.glow-orb {
-  position: absolute; border-radius: 50%;
-  pointer-events: none; opacity: 0.06; filter: blur(80px);
-}
-
+.cta-sub { font-size: 15px; color: var(--muted); max-width: 500px; line-height: 1.65; }
 </style>
 </head>
 <body>
 
 <div class="cursor" id="cursor"></div>
 
-<!-- NAV -->
 <nav>
   <div class="nav-logo">Estruturação Comercial</div>
   <div class="nav-counter" id="counter">01 / 08</div>
 </nav>
 
-<!-- PROGRESS -->
 <div class="progress-bar">
   <div class="progress-fill" id="progress" style="width:12.5%"></div>
 </div>
 
-<!-- DOTS -->
 <div class="dots" id="dots"></div>
 
-<!-- ARROWS -->
 <div class="arrows">
   <div class="arrow-btn" id="prev" onclick="navigate(-1)">←</div>
   <div class="arrow-btn" id="next" onclick="navigate(1)">→</div>
 </div>
 
-<!-- HINT -->
 <div class="hint" id="hint">
   <span class="key">←</span> <span class="key">→</span> navegar
 </div>
 
-<!-- DECK -->
 <div class="deck" id="deck">
 
   <!-- ════════ SLIDE 0 — CAPA ════════ -->
@@ -542,44 +531,49 @@ nav {
     </div>
   </div>
 
-  <!-- ════════ SLIDE 1 — CUSTO DE INÉRCIA ════════ -->
+  <!-- ════════ SLIDE 1 — GRÁFICO DE CRESCIMENTO ════════ -->
   <div class="slide" id="s1">
     <div class="grid-bg"></div>
     <div class="noise"></div>
-    <div class="glow-orb" style="width:500px;height:500px;background:var(--red);right:-80px;bottom:-80px;"></div>
-    <div class="inercia-layout">
-      <div class="inercia-left">
-        <div class="label anim-item">O problema real</div>
-        <h2 class="inercia-title anim-item">
-          <span style="color:var(--red)">Custo</span><br>
-          <span style="color:var(--white)">de</span><br>
-          <span style="color:var(--white)">Inércia</span>
+    <div class="glow-orb" style="width:500px;height:500px;background:var(--accent);right:-80px;bottom:-80px;"></div>
+    <div class="chart-layout">
+      <div class="chart-left">
+        <div class="label anim-item">O que é possível</div>
+        <h2 class="chart-left-title anim-item">
+          <span style="color:var(--white)">De</span>
+          <span style="color:var(--accent)"> R$200k</span><br>
+          <span style="color:var(--white)">a</span>
+          <span style="color:var(--accent)"> R$2,5M</span><br>
+          <span style="color:var(--white)">em 90 dias</span>
         </h2>
-        <p class="inercia-desc anim-item">
-          Não estruturar seu comercial tem um custo invisível — mas crescente. Cada semana sem processo é uma semana que você depende de sorte, talento individual ou indicações que não controlamos.
+        <p class="chart-left-desc anim-item">
+          Quando as três engrenagens funcionam juntas, o crescimento deixa de ser acidental e passa a ser previsível. Veja a curva:
         </p>
+        <div class="chart-milestones anim-item">
+          <div class="milestone">
+            <div class="milestone-dot" style="background:var(--muted)"></div>
+            <div class="milestone-label">Início</div>
+            <div class="milestone-val" style="color:var(--muted)">R$ 200.000</div>
+          </div>
+          <div class="milestone">
+            <div class="milestone-dot" style="background:var(--blue)"></div>
+            <div class="milestone-label">30 dias</div>
+            <div class="milestone-val" style="color:var(--blue)">R$ 600.000</div>
+          </div>
+          <div class="milestone">
+            <div class="milestone-dot" style="background:var(--purple)"></div>
+            <div class="milestone-label">60 dias</div>
+            <div class="milestone-val" style="color:var(--purple)">R$ 1.300.000</div>
+          </div>
+          <div class="milestone">
+            <div class="milestone-dot" style="background:var(--accent)"></div>
+            <div class="milestone-label">90 dias</div>
+            <div class="milestone-val" style="color:var(--accent)">R$ 2.500.000</div>
+          </div>
+        </div>
       </div>
-      <div class="inercia-right">
-        <div class="inercia-card anim-item" style="--item-col:#EF4444">
-          <div class="inercia-card-num">01 — SINTOMA</div>
-          <div class="inercia-card-title">Vendas dependem de uma pessoa</div>
-          <div class="inercia-card-sub">Se o seu melhor vendedor sair hoje, seu faturamento cai. Isso é processo inexistente.</div>
-        </div>
-        <div class="inercia-card anim-item" style="--item-col:#F97316">
-          <div class="inercia-card-num">02 — SINTOMA</div>
-          <div class="inercia-card-title">Não sabe de onde vêm os clientes</div>
-          <div class="inercia-card-sub">Sem rastrear canais, você investe no escuro e não consegue escalar o que funciona.</div>
-        </div>
-        <div class="inercia-card anim-item" style="--item-col:#EAB308">
-          <div class="inercia-card-num">03 — SINTOMA</div>
-          <div class="inercia-card-title">O preço sempre "tá caro"</div>
-          <div class="inercia-card-sub">Quando o cliente foca no preço, é porque você ainda não construiu valor antes de revelar o número.</div>
-        </div>
-        <div class="inercia-card anim-item" style="--item-col:#22C55E">
-          <div class="inercia-card-num">A SOLUÇÃO</div>
-          <div class="inercia-card-title">Três engrenagens que mudam tudo</div>
-          <div class="inercia-card-sub">Canais + Processo + Oferta. Juntos, eles formam uma operação comercial independente de sorte.</div>
-        </div>
+      <div class="chart-area anim-item">
+        <canvas id="growth-chart"></canvas>
       </div>
     </div>
   </div>
@@ -592,28 +586,44 @@ nav {
       <h2 class="tres-title anim-item">
         As três <span style="color:var(--accent)">engrenagens</span><br>do comercial
       </h2>
-      <div class="tres-grid">
-        <div class="engrenagem anim-item" style="--eg-col:var(--accent)">
-          <div class="engrenagem-num">01</div>
-          <div class="engrenagem-icon">📡</div>
-          <div class="engrenagem-name">Canais de Aquisição</div>
-          <div class="engrenagem-desc">De onde vêm seus clientes? Inbound, Outbound ou Parcerias — cada canal tem lógica própria e taxas distintas.</div>
-          <div class="engrenagem-tag">Aula 01</div>
+      <div class="engrenagens-cards anim-item">
+
+        <div class="eng-card">
+          <div class="eng-topbar" style="background:#F97316"></div>
+          <div class="eng-icon-wrap" style="background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.2)">
+            <svg class="gear-rotate-cw" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+          <div class="eng-num" style="color:#F97316">01</div>
+          <div class="eng-title">Canais de<br>Aquisição</div>
         </div>
-        <div class="engrenagem anim-item" style="--eg-col:var(--purple)">
-          <div class="engrenagem-num">02</div>
-          <div class="engrenagem-icon">⚙️</div>
-          <div class="engrenagem-name">Processo Comercial</div>
-          <div class="engrenagem-desc">Como um lead vira cliente? 7 etapas, micro-taxas mensuráveis e um funil que funciona sem improviso.</div>
-          <div class="engrenagem-tag" style="background:rgba(139,92,246,0.12);color:var(--purple)">Aula 02</div>
+
+        <div class="eng-card">
+          <div class="eng-topbar" style="background:#22C55E"></div>
+          <div class="eng-icon-wrap" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.2)">
+            <svg class="gear-rotate-ccw" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+          <div class="eng-num" style="color:#22C55E">02</div>
+          <div class="eng-title" style="color:#22C55E">Processo<br>Comercial</div>
         </div>
-        <div class="engrenagem anim-item" style="--eg-col:var(--orange)">
-          <div class="engrenagem-num">03</div>
-          <div class="engrenagem-icon">🎯</div>
-          <div class="engrenagem-name">Construção de Oferta</div>
-          <div class="engrenagem-desc">O que o cliente compra? Não é seu produto — é a transformação. E isso se constrói com estrutura.</div>
-          <div class="engrenagem-tag" style="background:rgba(249,115,22,0.12);color:var(--orange)">Aula 03</div>
+
+        <div class="eng-card">
+          <div class="eng-topbar" style="background:#8B5CF6"></div>
+          <div class="eng-icon-wrap" style="background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.2)">
+            <svg class="gear-rotate-cw2" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+          <div class="eng-num" style="color:#8B5CF6">03</div>
+          <div class="eng-title">Construção<br>de Oferta</div>
         </div>
+
       </div>
     </div>
   </div>
@@ -635,9 +645,9 @@ nav {
           <div class="canal-name">Inbound</div>
           <div class="canal-slogan">O cliente chega até você.</div>
           <ul class="canal-items">
-            <li style="color:var(--text)">Conteúdo orgânico e autoridade</li>
-            <li style="color:var(--text)">Redes sociais e marca pessoal</li>
-            <li style="color:var(--text)">Indicações e boca a boca</li>
+            <li>Conteúdo orgânico e autoridade</li>
+            <li>Redes sociais e marca pessoal</li>
+            <li>Indicações e boca a boca</li>
             <li style="color:var(--muted)">Custo cai com o tempo</li>
           </ul>
           <div class="canal-bar" style="background:var(--accent)"></div>
@@ -647,9 +657,9 @@ nav {
           <div class="canal-name">Outbound</div>
           <div class="canal-slogan">Você vai até o cliente.</div>
           <ul class="canal-items">
-            <li style="color:var(--text)">Cold email e cold call</li>
-            <li style="color:var(--text)">LinkedIn e social selling</li>
-            <li style="color:var(--text)">Eventos e networking</li>
+            <li>Cold email e cold call</li>
+            <li>LinkedIn e social selling</li>
+            <li>Eventos e networking</li>
             <li style="color:var(--muted)">Resultados mais rápidos</li>
           </ul>
           <div class="canal-bar" style="background:var(--purple)"></div>
@@ -659,9 +669,9 @@ nav {
           <div class="canal-name">Parcerias</div>
           <div class="canal-slogan">Alguém te apresenta.</div>
           <ul class="canal-items">
-            <li style="color:var(--text)">Programas de indicação</li>
-            <li style="color:var(--text)">Co-marketing e afiliados</li>
-            <li style="color:var(--text)">Canais de revenda</li>
+            <li>Programas de indicação</li>
+            <li>Co-marketing e afiliados</li>
+            <li>Canais de revenda</li>
             <li style="color:var(--muted)">Custo baixo, dependência alta</li>
           </ul>
           <div class="canal-bar" style="background:var(--orange)"></div>
@@ -679,71 +689,53 @@ nav {
       <div class="processo-left">
         <div class="label anim-item">Engrenagem 02</div>
         <h2 class="processo-title anim-item">Processo <span>Comercial</span></h2>
-        <p class="processo-desc anim-item">Uma sequência de etapas que transforma um lead frio em cliente — de forma sistemática, mensurável e escalável.</p>
-        <div class="processo-stat anim-item">
-          <div class="p-stat-item">
-            <span class="p-stat-val">7</span>
-            <span class="p-stat-label">Etapas</span>
-          </div>
-          <div class="p-stat-item">
-            <span class="p-stat-val">5×</span>
-            <span class="p-stat-label">Micro-taxas</span>
-          </div>
-          <div class="p-stat-item">
-            <span class="p-stat-val">∞</span>
-            <span class="p-stat-label">Escalável</span>
+        <p class="processo-desc anim-item">7 etapas que transformam um lead frio em cliente — de forma sistemática e mensurável.</p>
+
+        <div class="conversion-formula anim-item">
+          <div class="conv-label">Como calcular taxa de conversão</div>
+          <div class="conv-eq">
+            <span class="hl">Taxa (%) = </span><span>(Saída ÷ Entrada) × 100</span><br>
+            <span class="muted">Ex: 37 fechados ÷ 1000 abordados × 100 = </span><span class="hl">3,7%</span><br>
+            <span class="muted">Entre etapas: fechados ÷ negociações × 100</span>
           </div>
         </div>
       </div>
-      <div class="funil-visual anim-item">
-        <div class="funil-step">
-          <div class="funil-label">Abordagem</div>
-          <div class="funil-bar-wrap">
-            <div class="funil-bar-bg">
-              <div class="funil-bar-fill" style="width:100%;background:var(--accent)"><span>1.000 leads</span></div>
-            </div>
-          </div>
-          <div class="funil-count" style="color:var(--accent)">100%</div>
+
+      <div class="etapas-list anim-item">
+        <div class="etapa" style="--etapa-col:#38BDF8">
+          <div class="etapa-num">01</div>
+          <div class="etapa-name">Prospecção</div>
+          <div class="etapa-pct" style="color:#38BDF8">→</div>
         </div>
-        <div class="funil-arrow">↓ 40%</div>
-        <div class="funil-step">
-          <div class="funil-label">Apresentação</div>
-          <div class="funil-bar-wrap">
-            <div class="funil-bar-bg">
-              <div class="funil-bar-fill" style="width:40%;background:var(--blue)"><span>400</span></div>
-            </div>
-          </div>
-          <div class="funil-count" style="color:var(--blue)">40%</div>
+        <div class="etapa" style="--etapa-col:#C8F135">
+          <div class="etapa-num">02</div>
+          <div class="etapa-name">Abordagem</div>
+          <div class="etapa-pct" style="color:#C8F135">40%</div>
         </div>
-        <div class="funil-arrow">↓ 65%</div>
-        <div class="funil-step">
-          <div class="funil-label">Relacionamento</div>
-          <div class="funil-bar-wrap">
-            <div class="funil-bar-bg">
-              <div class="funil-bar-fill" style="width:26%;background:var(--purple)"><span>260</span></div>
-            </div>
-          </div>
-          <div class="funil-count" style="color:var(--purple)">26%</div>
+        <div class="etapa" style="--etapa-col:#8B5CF6">
+          <div class="etapa-num">03</div>
+          <div class="etapa-name">Apresentação</div>
+          <div class="etapa-pct" style="color:#8B5CF6">65%</div>
         </div>
-        <div class="funil-arrow">↓ 75%</div>
-        <div class="funil-step">
-          <div class="funil-label">Negociação</div>
-          <div class="funil-bar-wrap">
-            <div class="funil-bar-bg">
-              <div class="funil-bar-fill" style="width:11%;background:var(--orange)"><span>107</span></div>
-            </div>
-          </div>
-          <div class="funil-count" style="color:var(--orange)">11%</div>
+        <div class="etapa" style="--etapa-col:#F97316">
+          <div class="etapa-num">04</div>
+          <div class="etapa-name">Geração de Relacionamento</div>
+          <div class="etapa-pct" style="color:#F97316">75%</div>
         </div>
-        <div class="funil-arrow">↓ 35%</div>
-        <div class="funil-step">
-          <div class="funil-label" style="color:var(--green);font-weight:700">✓ Fechados</div>
-          <div class="funil-bar-wrap">
-            <div class="funil-bar-bg">
-              <div class="funil-bar-fill" style="width:4%;background:var(--green);min-width:60px"><span>37</span></div>
-            </div>
-          </div>
-          <div class="funil-count" style="color:var(--green);font-weight:800">3,7%</div>
+        <div class="etapa" style="--etapa-col:#38BDF8">
+          <div class="etapa-num">05</div>
+          <div class="etapa-name">Follow</div>
+          <div class="etapa-pct" style="color:#38BDF8">→</div>
+        </div>
+        <div class="etapa" style="--etapa-col:#EAB308">
+          <div class="etapa-num">06</div>
+          <div class="etapa-name">Negociação</div>
+          <div class="etapa-pct" style="color:#EAB308">60%</div>
+        </div>
+        <div class="etapa" style="--etapa-col:#22C55E">
+          <div class="etapa-num">07</div>
+          <div class="etapa-name">Fechamento</div>
+          <div class="etapa-pct" style="color:#22C55E">35%</div>
         </div>
       </div>
     </div>
@@ -786,7 +778,7 @@ nav {
           <div class="oferta-el-name">Bônus e Extras</div>
           <div class="oferta-el-desc">Elementos que multiplicam o valor percebido sem aumentar o custo.</div>
         </div>
-        <div class="oferta-el" style="--el-col:var(--yellow,#EAB308)">
+        <div class="oferta-el" style="--el-col:#EAB308">
           <div class="oferta-el-ico">⚡</div>
           <div class="oferta-el-name">Urgência Real</div>
           <div class="oferta-el-desc">Motivo genuíno para decidir agora — não um gatilho falso.</div>
@@ -805,7 +797,7 @@ nav {
     </div>
   </div>
 
-  <!-- ════════ SLIDE 6 — FÓRMULA ════════ -->
+  <!-- ════════ SLIDE 6 — FÓRMULA ANIMADA ════════ -->
   <div class="slide" id="s6">
     <div class="grid-bg"></div>
     <div class="noise"></div>
@@ -851,15 +843,21 @@ nav {
     <div class="cta-layout">
       <div class="badge anim-item"><span class="badge-dot"></span>Continue aprendendo</div>
       <h2 class="cta-big anim-item">
-        <span class="cta-line1">Quer ir</span>
-        <span class="cta-line2">mais fundo?</span>
+        <span class="cta-line1">Gostou do que ouviu?</span>
+        <span class="cta-line2">Me siga no IG!</span>
       </h2>
-      <div class="ig-block anim-item" onclick="window.open('https://www.instagram.com/gustavoobenedetti','_blank')">
-        <div>
-          <div class="ig-at">@gustavoobenedetti</div>
-          <div class="ig-label">Instagram · Conteúdo sobre Vendas</div>
+      <div class="cta-bottom anim-item">
+        <div class="ig-block" onclick="window.open('https://www.instagram.com/gustavoobenedetti','_blank')">
+          <div>
+            <div class="ig-at">@gustavoobenedetti</div>
+            <div class="ig-label">Instagram · Conteúdo sobre Vendas</div>
+          </div>
+          <div class="ig-icon">📲</div>
         </div>
-        <div class="ig-icon">📲</div>
+        <div class="qr-block">
+          <canvas id="qr-canvas" width="120" height="120"></canvas>
+          <div class="qr-label">Aponte a câmera</div>
+        </div>
       </div>
       <p class="cta-sub anim-item">
         Conteúdo prático sobre estruturação comercial, processo de vendas e construção de oferta — todo dia no Instagram.
@@ -870,18 +868,17 @@ nav {
 </div><!-- /deck -->
 
 <script>
+/* ─── NAVIGATION ─── */
 const TOTAL = 8;
 let current = 0;
 let isAnimating = false;
 
-// Cursor
 const cursorEl = document.getElementById('cursor');
 document.addEventListener('mousemove', e => {
   cursorEl.style.left = e.clientX + 'px';
   cursorEl.style.top = e.clientY + 'px';
 });
 
-// Build dots
 const dotsEl = document.getElementById('dots');
 for (let i = 0; i < TOTAL; i++) {
   const d = document.createElement('div');
@@ -894,19 +891,15 @@ function goTo(target) {
   if (isAnimating || target === current) return;
   if (target < 0 || target >= TOTAL) return;
   isAnimating = true;
-
   const dir = target > current ? 1 : -1;
   const slides = document.querySelectorAll('.slide');
   const from = slides[current];
   const to = slides[target];
-
   from.classList.remove('active');
   from.classList.add(dir > 0 ? 'exit-left' : 'exit-right');
-
   to.style.transform = dir > 0 ? 'translateX(60px)' : 'translateX(-60px)';
   to.style.opacity = '0';
   to.style.pointerEvents = 'none';
-
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       to.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
@@ -914,17 +907,17 @@ function goTo(target) {
       to.style.opacity = '1';
       to.style.pointerEvents = 'all';
       to.classList.add('active');
-
       setTimeout(() => {
         from.classList.remove('exit-left', 'exit-right');
         to.style.transition = '';
         to.style.transform = '';
         to.style.opacity = '';
         isAnimating = false;
+        if (target === 1) drawGrowthChart();
+        if (target === 7) drawQR();
       }, 480);
     });
   });
-
   current = target;
   updateUI();
 }
@@ -938,24 +931,18 @@ function updateUI() {
   document.querySelectorAll('.dot').forEach((d, i) => {
     d.classList.toggle('active', i === current);
   });
-  // hide hint after first nav
   if (current > 0) document.getElementById('hint').classList.add('hidden');
 }
 
-// Keyboard
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
     e.preventDefault(); navigate(1);
   } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
     e.preventDefault(); navigate(-1);
-  } else if (e.key === 'Home') {
-    goTo(0);
-  } else if (e.key === 'End') {
-    goTo(TOTAL - 1);
-  }
+  } else if (e.key === 'Home') { goTo(0); }
+    else if (e.key === 'End') { goTo(TOTAL - 1); }
 });
 
-// Touch swipe
 let touchX = 0;
 document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
 document.addEventListener('touchend', e => {
@@ -963,7 +950,200 @@ document.addEventListener('touchend', e => {
   if (Math.abs(dx) > 50) navigate(dx < 0 ? 1 : -1);
 }, { passive: true });
 
+/* ─── GROWTH CHART ─── */
+let chartDrawn = false;
+function drawGrowthChart() {
+  if (chartDrawn) return;
+  chartDrawn = true;
+  const canvas = document.getElementById('growth-chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 500;
+  const H = canvas.offsetHeight || 320;
+  canvas.width = W * 2; canvas.height = H * 2;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.scale(2, 2);
+
+  const pad = { top: 30, right: 30, bottom: 50, left: 70 };
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top - pad.bottom;
+
+  const days = [0, 15, 30, 45, 60, 75, 90];
+  const values = [200000, 320000, 600000, 850000, 1300000, 1850000, 2500000];
+  const minV = 0, maxV = 2700000;
+
+  function xPos(d) { return pad.left + (d / 90) * cw; }
+  function yPos(v) { return pad.top + ch - ((v - minV) / (maxV - minV)) * ch; }
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  [0, 500000, 1000000, 1500000, 2000000, 2500000].forEach(v => {
+    const y = yPos(v);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cw, y); ctx.stroke();
+    ctx.fillStyle = '#555';
+    ctx.font = '10px Space Mono, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(v >= 1000000 ? 'R$' + (v/1000000).toFixed(1) + 'M' : 'R$' + (v/1000) + 'k', pad.left - 8, y + 4);
+  });
+
+  // X axis labels
+  [0, 30, 60, 90].forEach(d => {
+    const x = xPos(d);
+    ctx.fillStyle = '#555';
+    ctx.font = '10px Space Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(d + ' dias', x, pad.top + ch + 20);
+  });
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + ch);
+  grad.addColorStop(0, 'rgba(200,241,53,0.3)');
+  grad.addColorStop(1, 'rgba(200,241,53,0)');
+  ctx.beginPath();
+  ctx.moveTo(xPos(0), yPos(0));
+  days.forEach((d, i) => ctx.lineTo(xPos(d), yPos(values[i])));
+  ctx.lineTo(xPos(90), yPos(0));
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Curve line — animate
+  let progress = 0;
+  const totalPoints = days.length;
+  function animate() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Redraw grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 1;
+    [0, 500000, 1000000, 1500000, 2000000, 2500000].forEach(v => {
+      const y = yPos(v);
+      ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cw, y); ctx.stroke();
+      ctx.fillStyle = '#555';
+      ctx.font = '10px Space Mono, monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(v >= 1000000 ? 'R$' + (v/1000000).toFixed(1) + 'M' : 'R$' + (v/1000) + 'k', pad.left - 8, y + 4);
+    });
+    [0, 30, 60, 90].forEach(d => {
+      ctx.fillStyle = '#555';
+      ctx.font = '10px Space Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(d + ' dias', xPos(d), pad.top + ch + 20);
+    });
+
+    // Compute current visible segment
+    const p = Math.min(progress, 1);
+    const totalDist = 90;
+    const currentDay = p * totalDist;
+
+    function interpolate(day) {
+      for (let i = 0; i < days.length - 1; i++) {
+        if (day >= days[i] && day <= days[i+1]) {
+          const t = (day - days[i]) / (days[i+1] - days[i]);
+          return values[i] + t * (values[i+1] - values[i]);
+        }
+      }
+      return values[values.length - 1];
+    }
+
+    // Fill
+    ctx.beginPath();
+    ctx.moveTo(xPos(0), yPos(0));
+    for (let d = 0; d <= currentDay; d += 1) {
+      ctx.lineTo(xPos(d), yPos(interpolate(d)));
+    }
+    ctx.lineTo(xPos(currentDay), yPos(0));
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    ctx.moveTo(xPos(0), yPos(values[0]));
+    for (let d = 0; d <= currentDay; d += 1) {
+      ctx.lineTo(xPos(d), yPos(interpolate(d)));
+    }
+    ctx.strokeStyle = '#C8F135';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Milestone dots
+    const milestoneColors = ['#555555', '#38BDF8', '#8B5CF6', '#C8F135'];
+    const milestoneDays = [0, 30, 60, 90];
+    milestoneDays.forEach((md, i) => {
+      if (md <= currentDay) {
+        const x = xPos(md); const y = yPos(values[days.indexOf(md)]);
+        ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = milestoneColors[i]; ctx.fill();
+        ctx.strokeStyle = '#070707'; ctx.lineWidth = 2; ctx.stroke();
+      }
+    });
+
+    // Glow dot at current position
+    if (p < 1) {
+      const cx2 = xPos(currentDay); const cy2 = yPos(interpolate(currentDay));
+      ctx.beginPath(); ctx.arc(cx2, cy2, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#C8F135'; ctx.fill();
+      ctx.beginPath(); ctx.arc(cx2, cy2, 10, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(200,241,53,0.3)'; ctx.fill();
+    }
+
+    progress += 0.012;
+    if (progress < 1) requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+/* ─── QR CODE ─── */
+let qrDrawn = false;
+function drawQR() {
+  if (qrDrawn) return;
+  qrDrawn = true;
+  const canvas = document.getElementById('qr-canvas');
+  if (!canvas) return;
+  const url = 'https://www.instagram.com/gustavoobenedetti';
+  generateQR(canvas, url);
+}
+
+// Minimal QR code generator using a simple matrix approach
+// We'll use a data URI redirect approach with a pre-encoded QR
+function generateQR(canvas, url) {
+  const ctx = canvas.getContext('2d');
+  const size = 120;
+  canvas.width = size; canvas.height = size;
+
+  // Use QRious library approach via dynamic script
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js';
+  script.onload = function() {
+    const qr = new QRious({
+      element: canvas,
+      value: url,
+      size: size,
+      background: '#181818',
+      foreground: '#C8F135',
+      level: 'H'
+    });
+  };
+  script.onerror = function() {
+    // Fallback: draw a simple placeholder
+    ctx.fillStyle = '#181818';
+    ctx.fillRect(0, 0, size, size);
+    ctx.fillStyle = '#C8F135';
+    ctx.font = '9px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('@gustavoobenedetti', size/2, size/2 - 4);
+    ctx.fillText('no Instagram', size/2, size/2 + 10);
+  };
+  document.head.appendChild(script);
+}
+
 updateUI();
+// Draw chart if starting on slide 1
+if (current === 1) drawGrowthChart();
+if (current === 7) drawQR();
 </script>
 </body>
 </html>
