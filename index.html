@@ -2,25 +2,25 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Estruturação Comercial</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #070707;
-  --surface: #111111;
   --card: #181818;
   --border: #242424;
   --accent: #C8F135;
-  --accent-dim: rgba(200,241,53,0.12);
   --purple: #8B5CF6;
   --orange: #F97316;
   --blue: #38BDF8;
   --red: #EF4444;
   --green: #22C55E;
   --text: #E0E0E0;
-  --muted: #555;
+  --muted: #666;
   --white: #FFFFFF;
+  --nav-h: 56px;
+  --bar-h: 60px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,461 +30,446 @@ body {
   background: var(--bg);
   font-family: 'Montserrat', sans-serif;
   color: var(--text);
-  cursor: none;
+  -webkit-font-smoothing: antialiased;
 }
 
-.cursor {
-  position: fixed; width: 10px; height: 10px;
-  background: var(--accent); border-radius: 50%;
-  pointer-events: none; z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: width 0.2s, height 0.2s;
-  mix-blend-mode: difference;
+@media (hover: hover) {
+  body { cursor: none; }
+  .cursor {
+    position: fixed; width: 10px; height: 10px;
+    background: var(--accent); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+  }
 }
+@media (hover: none) { .cursor { display: none; } }
 
-.deck { width: 100vw; height: 100vh; position: relative; }
-
-.slide {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 80px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.5s ease, transform 0.5s ease;
-  transform: translateX(60px);
-  will-change: opacity, transform;
-}
-.slide.active {
-  opacity: 1; pointer-events: all; transform: translateX(0);
-}
-.slide.exit-left { opacity: 0; transform: translateX(-60px); }
-.slide.exit-right { opacity: 0; transform: translateX(60px); }
-
-.grid-bg {
-  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
-  background-image:
-    linear-gradient(rgba(200,241,53,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(200,241,53,0.02) 1px, transparent 1px);
-  background-size: 70px 70px;
-  animation: gridDrift 25s linear infinite;
-}
-@keyframes gridDrift { 0%{transform:translateY(0)} 100%{transform:translateY(70px)} }
-
-.noise {
-  position: absolute; inset: 0; pointer-events: none; opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
+/* NAV */
 nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  padding: 24px 48px;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: var(--nav-h);
+  padding: 0 20px;
   display: flex; align-items: center; justify-content: space-between;
+  background: rgba(7,7,7,.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
 }
-.nav-logo {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.2em;
-  text-transform: uppercase; color: var(--muted);
-}
-.nav-counter {
-  font-family: 'Space Mono', monospace;
-  font-size: 11px; color: var(--muted);
-  letter-spacing: 0.1em;
-}
+.nav-logo { font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.nav-counter { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
 
+/* PROGRESS */
 .progress-bar {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 200;
   height: 2px; background: var(--border);
 }
 .progress-fill {
   height: 100%; background: var(--accent);
-  transition: width 0.4s ease;
-  box-shadow: 0 0 12px var(--accent);
+  transition: width .4s ease;
+  box-shadow: 0 0 10px var(--accent);
 }
 
-.arrows {
-  position: fixed; bottom: 32px; right: 48px; z-index: 100;
-  display: flex; gap: 8px;
+/* DECK */
+.deck {
+  position: fixed;
+  top: calc(var(--nav-h) + 2px);
+  bottom: var(--bar-h);
+  left: 0; right: 0;
+  overflow: hidden;
 }
+
+/* SLIDES */
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  padding: 20px 18px 16px;
+  opacity: 0; pointer-events: none;
+  transform: translateX(48px);
+  transition: opacity .42s ease, transform .42s ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.slide::-webkit-scrollbar { display: none; }
+@media (min-width: 768px) {
+  .slide {
+    justify-content: center;
+    padding: 32px 48px 24px;
+  }
+}
+.slide.active  { opacity: 1; pointer-events: all; transform: translateX(0); }
+.slide.exit-l  { opacity: 0; transform: translateX(-48px); }
+.slide.exit-r  { opacity: 0; transform: translateX(48px); }
+
+/* BG */
+.grid-bg {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  background-image:
+    linear-gradient(rgba(200,241,53,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,241,53,.025) 1px, transparent 1px);
+  background-size: 56px 56px;
+  animation: gridDrift 20s linear infinite;
+}
+@keyframes gridDrift { 0%{transform:translateY(0)} 100%{transform:translateY(56px)} }
+
+.noise {
+  position: absolute; inset: 0; pointer-events: none; opacity: .02;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.glow-orb {
+  position: absolute; border-radius: 50%;
+  pointer-events: none; opacity: .06; filter: blur(70px);
+}
+
+/* BOTTOM BAR */
+.bottom-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  height: var(--bar-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 18px;
+  background: rgba(7,7,7,.9);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+}
+.dots-row { display: flex; gap: 7px; align-items: center; }
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--border); transition: all .3s; cursor: pointer;
+}
+.dot.active { background: var(--accent); width: 18px; border-radius: 3px; }
+.nav-btns { display: flex; gap: 8px; }
 .arrow-btn {
-  width: 40px; height: 40px;
+  width: 38px; height: 38px;
   background: var(--card); border: 1px solid var(--border);
   border-radius: 8px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s; color: var(--muted); font-size: 16px;
+  transition: all .2s; color: var(--muted); font-size: 15px;
+  user-select: none;
 }
 .arrow-btn:hover { border-color: var(--accent); color: var(--accent); }
-.arrow-btn:active { transform: scale(0.92); }
+.arrow-btn:active { transform: scale(.92); }
 
-.hint {
-  position: fixed; bottom: 36px; left: 48px; z-index: 100;
-  font-size: 10px; color: var(--muted); letter-spacing: 0.12em;
-  text-transform: uppercase;
-  display: flex; align-items: center; gap: 8px;
-  opacity: 1; transition: opacity 0.5s;
-}
-.hint.hidden { opacity: 0; }
-.key {
-  padding: 3px 7px; background: var(--card);
-  border: 1px solid var(--border); border-radius: 4px;
-  font-family: 'Space Mono', monospace; font-size: 10px;
-  color: var(--text);
-}
-
+/* ATOMS */
 .label {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
-  text-transform: uppercase; color: var(--accent);
-  margin-bottom: 16px;
+  font-size: 9px; font-weight: 700; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
 }
-
-.big-title {
-  font-size: clamp(56px, 8.5vw, 120px);
-  font-weight: 900; line-height: 0.9;
-  letter-spacing: -0.04em; color: var(--white);
-  text-align: center;
-}
-.big-title .hl { color: var(--accent); }
-
 .badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(200,241,53,0.1); border: 1px solid rgba(200,241,53,0.3);
-  color: var(--accent); font-size: 10px; font-weight: 700;
-  padding: 6px 16px; border-radius: 20px;
-  margin-bottom: 36px; letter-spacing: 0.12em; text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(200,241,53,.1); border: 1px solid rgba(200,241,53,.3);
+  color: var(--accent); font-size: 9px; font-weight: 700;
+  padding: 5px 13px; border-radius: 20px;
+  margin-bottom: 20px; letter-spacing: .12em; text-transform: uppercase;
 }
 .badge-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
-  animation: pulse 2s infinite;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
+  animation: bdPulse 2s infinite;
 }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
+@keyframes bdPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
 
-.capa-line { display: block; }
-.capa-line.dim { color: rgba(255,255,255,0.15); }
-
-.capa-desc {
-  font-size: 18px; color: var(--muted); max-width: 520px;
-  line-height: 1.65; margin-top: 36px;
-}
-
-.bg-num {
-  position: absolute; right: -2vw; bottom: -8vh;
-  font-size: clamp(200px, 28vw, 380px); font-weight: 900;
-  color: rgba(200,241,53,0.025); line-height: 1;
-  user-select: none; pointer-events: none;
-  font-family: 'Space Mono', monospace;
-}
-
-.glow-orb {
-  position: absolute; border-radius: 50%;
-  pointer-events: none; opacity: 0.06; filter: blur(80px);
-}
-
-.dots {
-  position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
-  display: flex; gap: 8px; z-index: 100;
-}
-.dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--border); transition: all 0.3s; cursor: pointer;
-}
-.dot.active { background: var(--accent); width: 20px; border-radius: 3px; }
-
-.slide .anim-item {
-  opacity: 0; transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+/* ANIMS */
+.anim-item {
+  opacity: 0; transform: translateY(14px);
+  transition: opacity .55s ease, transform .55s ease;
 }
 .slide.active .anim-item { opacity: 1; transform: translateY(0); }
-.slide.active .anim-item:nth-child(1) { transition-delay: 0.05s; }
-.slide.active .anim-item:nth-child(2) { transition-delay: 0.12s; }
-.slide.active .anim-item:nth-child(3) { transition-delay: 0.19s; }
-.slide.active .anim-item:nth-child(4) { transition-delay: 0.26s; }
-.slide.active .anim-item:nth-child(5) { transition-delay: 0.33s; }
-.slide.active .anim-item:nth-child(6) { transition-delay: 0.40s; }
+.slide.active .anim-item:nth-child(1) { transition-delay: .06s; }
+.slide.active .anim-item:nth-child(2) { transition-delay: .14s; }
+.slide.active .anim-item:nth-child(3) { transition-delay: .22s; }
+.slide.active .anim-item:nth-child(4) { transition-delay: .30s; }
+.slide.active .anim-item:nth-child(5) { transition-delay: .38s; }
+.slide.active .anim-item:nth-child(6) { transition-delay: .46s; }
 
-/* ─── SLIDE 0 — CAPA ─── */
-#s0 .capa-content {
+/* ══════════════════
+   S0 — CAPA
+══════════════════ */
+.capa-content {
   position: relative; z-index: 1;
   display: flex; flex-direction: column;
-  align-items: center; text-align: center; gap: 0;
+  align-items: center; text-align: center;
+  padding-top: 20px;
+  width: 100%; max-width: 700px;
+}
+.capa-title {
+  font-size: clamp(44px, 13vw, 120px);
+  font-weight: 900; line-height: .88;
+  letter-spacing: -.04em; color: var(--white);
+  margin-bottom: 22px;
+}
+.capa-title .hl { color: var(--accent); display: block; }
+.capa-desc {
+  font-size: clamp(14px, 3.5vw, 18px);
+  color: var(--muted); max-width: 480px; line-height: 1.65;
 }
 
-/* ─── SLIDE 1 — GRÁFICO CRESCIMENTO ─── */
-#s1 .chart-layout {
+/* ══════════════════
+   S1 — GRÁFICO
+══════════════════ */
+.chart-wrap {
   position: relative; z-index: 1;
-  display: grid; grid-template-columns: 1fr 1.4fr;
-  gap: 60px; align-items: center;
-  max-width: 1100px; width: 100%;
+  width: 100%; max-width: 1100px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+@media (min-width: 860px) {
+  .chart-wrap { display: grid; grid-template-columns: 1fr 1.5fr; gap: 52px; align-items: center; }
 }
 .chart-left-title {
-  font-size: clamp(38px, 5vw, 62px);
-  font-weight: 900; line-height: 0.95; letter-spacing: -0.03em;
-  margin-bottom: 20px;
+  font-size: clamp(26px, 6.5vw, 56px);
+  font-weight: 900; line-height: .92; letter-spacing: -.03em; margin-bottom: 12px;
 }
-.chart-left-desc { font-size: 16px; color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
-.chart-milestones { display: flex; flex-direction: column; gap: 10px; }
+.chart-left-desc { font-size: clamp(12px, 2vw, 14px); color: var(--muted); line-height: 1.7; margin-bottom: 16px; }
+.chart-milestones { display: flex; flex-direction: column; gap: 7px; }
 .milestone {
-  display: flex; align-items: center; gap: 12px;
+  display: flex; align-items: center; gap: 11px;
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px 18px;
+  border-radius: 9px; padding: 9px 14px;
 }
-.milestone-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.milestone-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; flex: 1; }
-.milestone-val { font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; }
+.milestone-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.milestone-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; flex: 1; }
+.milestone-val { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; }
+#growth-chart { width: 100%; height: 220px; display: block; }
+@media (min-width: 768px) { #growth-chart { height: 290px; } }
 
-.chart-area { position: relative; }
-#growth-chart { width: 100%; height: 320px; }
-
-/* ─── SLIDE 2 — TRÊS ENGRENAGENS ─── */
-#s2 { }
+/* ══════════════════
+   S2 — ENGRENAGENS
+══════════════════ */
 .tres-layout {
   position: relative; z-index: 1;
   display: flex; flex-direction: column;
-  align-items: center; max-width: 1100px; width: 100%;
+  align-items: center; width: 100%; max-width: 1100px;
 }
 .tres-title {
-  font-size: clamp(38px, 5vw, 64px);
-  font-weight: 900; letter-spacing: -0.03em;
-  color: var(--white); text-align: center; margin-bottom: 48px;
-  line-height: 1.0;
+  font-size: clamp(26px, 6.5vw, 60px);
+  font-weight: 900; letter-spacing: -.03em;
+  color: var(--white); text-align: center; margin-bottom: 28px; line-height: 1;
 }
-.gears-container {
-  display: flex; align-items: center; justify-content: center; gap: 52px;
-  width: 100%;
+.eng-cards {
+  display: flex; flex-direction: column; gap: 12px; width: 100%;
 }
-.gear-item {
-  display: flex; flex-direction: column; align-items: center; gap: 20px;
-}
-.gear-name {
-  font-size: 12px; font-weight: 700; color: var(--white);
-  letter-spacing: 0.12em; text-align: center; text-transform: uppercase;
-}
-.gear-svg-wrap { position: relative; }
-
-/* SVG gear animations */
-.gear-rotate-cw  { animation: rotateCW  7s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
-.gear-rotate-ccw { animation: rotateCCW 9s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
-.gear-rotate-cw2 { animation: rotateCW 11s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
-@keyframes rotateCW  { from{transform:rotate(0deg)}   to{transform:rotate(360deg)} }
-@keyframes rotateCCW { from{transform:rotate(0deg)}   to{transform:rotate(-360deg)} }
-
-.engrenagens-cards {
-  display: flex; flex-direction: row; align-items: flex-start;
-  justify-content: center; gap: 24px; width: 100%;
-}
+@media (min-width: 560px) { .eng-cards { flex-direction: row; } }
 .eng-card {
-  flex: 1; max-width: 300px;
-  background: var(--card); border: 1px solid var(--border);
+  flex: 1; background: var(--card); border: 1px solid var(--border);
   border-radius: 16px; overflow: hidden;
   display: flex; flex-direction: column; align-items: center;
-  padding-bottom: 32px;
+  padding-bottom: 24px;
 }
 .eng-topbar { width: 100%; height: 3px; flex-shrink: 0; }
 .eng-icon-wrap {
-  width: 80px; height: 80px; border-radius: 18px;
-  border: 1px solid; display: flex; align-items: center; justify-content: center;
-  margin: 32px 0 20px;
+  width: 64px; height: 64px; border-radius: 15px; border: 1px solid;
+  display: flex; align-items: center; justify-content: center;
+  margin: 22px 0 14px;
 }
-.eng-num {
-  font-family: 'Space Mono', monospace;
-  font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
-  margin-bottom: 12px;
-}
-.eng-title {
-  font-size: 18px; font-weight: 800; color: var(--white);
-  text-align: center; line-height: 1.2;
-}
+.eng-num { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: .12em; margin-bottom: 8px; }
+.eng-title { font-size: clamp(13px, 2.5vw, 16px); font-weight: 800; color: var(--white); text-align: center; line-height: 1.3; padding: 0 12px; }
 
-.gear-connector { font-size: 28px; color: var(--border); padding: 0 8px; margin-top: -40px; }
+.gear-rotate-cw  { animation: rotateCW  7s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
+.gear-rotate-ccw { animation: rotateCCW 9s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
+.gear-rotate-cw2 { animation: rotateCW 11s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
+@keyframes rotateCW  { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes rotateCCW { from{transform:rotate(0deg)} to{transform:rotate(-360deg)} }
 
-/* ─── SLIDE 3 — CANAIS ─── */
-.canais-layout {
+/* ══════════════════
+   S3 — CANAIS
+══════════════════ */
+.canais-wrap {
   position: relative; z-index: 1;
-  max-width: 1100px; width: 100%;
+  width: 100%; max-width: 1100px;
 }
-.canais-header { margin-bottom: 48px; }
+.canais-hdr { margin-bottom: 20px; }
 .canais-title {
-  font-size: clamp(40px, 5.5vw, 70px);
-  font-weight: 900; letter-spacing: -0.03em; color: var(--white);
-  line-height: 0.95; margin-bottom: 16px;
+  font-size: clamp(28px, 7.5vw, 66px);
+  font-weight: 900; letter-spacing: -.03em; color: var(--white);
+  line-height: .92; margin-bottom: 10px;
 }
 .canais-title span { color: var(--accent); }
-.canais-sub { font-size: 16px; color: var(--muted); max-width: 560px; line-height: 1.6; }
-.canais-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.canais-sub { font-size: clamp(12px, 2vw, 14px); color: var(--muted); line-height: 1.6; max-width: 520px; }
+.canais-grid { display: flex; flex-direction: column; gap: 10px; }
+@media (min-width: 560px) { .canais-grid { flex-direction: row; } }
 .canal {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 14px; padding: 28px 24px;
+  flex: 1; background: var(--card); border: 1px solid var(--border);
+  border-radius: 13px; padding: 20px 18px;
   position: relative; overflow: hidden;
 }
 .canal-tag {
   display: inline-block; font-size: 9px; font-weight: 700;
-  letter-spacing: 0.15em; text-transform: uppercase;
-  padding: 3px 10px; border-radius: 4px; margin-bottom: 16px;
+  letter-spacing: .13em; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 4px; margin-bottom: 10px;
 }
-.canal-name { font-size: 22px; font-weight: 800; color: var(--white); margin-bottom: 6px; }
-.canal-slogan { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
-.canal-items { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.canal-items li { font-size: 13px; display: flex; gap: 8px; color: var(--text); }
-.canal-items li::before { content: '→'; flex-shrink: 0; }
+.canal-name { font-size: clamp(17px, 3.5vw, 21px); font-weight: 800; color: var(--white); margin-bottom: 3px; }
+.canal-slogan { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+.canal-items { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.canal-items li { font-size: 12px; display: flex; gap: 7px; color: var(--text); }
+.canal-items li::before { content: '→'; flex-shrink: 0; color: var(--muted); }
 .canal-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
 
-/* ─── SLIDE 4 — PROCESSO COMERCIAL ─── */
-.processo-layout {
+/* ══════════════════
+   S4 — PROCESSO
+══════════════════ */
+.processo-wrap {
   position: relative; z-index: 1;
-  max-width: 1100px; width: 100%;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+  width: 100%; max-width: 1100px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+@media (min-width: 860px) {
+  .processo-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 52px; align-items: center; }
 }
 .processo-title {
-  font-size: clamp(32px, 4vw, 52px);
-  font-weight: 900; letter-spacing: -0.03em; color: var(--white);
-  line-height: 0.95; margin-bottom: 16px;
+  font-size: clamp(26px, 5.5vw, 52px);
+  font-weight: 900; letter-spacing: -.03em; color: var(--white);
+  line-height: .92; margin-bottom: 10px;
 }
 .processo-title span { color: var(--accent); }
-.processo-desc { font-size: 15px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
-
-.conversion-formula {
-  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-  padding: 18px 20px;
+.processo-desc { font-size: clamp(12px, 2vw, 14px); color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+.conv-formula {
+  background: var(--card); border: 1px solid rgba(200,241,53,.2);
+  border-radius: 11px; padding: 14px 16px;
 }
-.conv-label { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
-.conv-eq { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text); line-height: 1.8; }
+.conv-label { font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); margin-bottom: 7px; }
+.conv-eq { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text); line-height: 1.9; }
 .conv-eq .hl { color: var(--accent); }
-.conv-eq .muted { color: var(--muted); }
+.conv-eq .mt { color: var(--muted); }
 
-.etapas-list { display: flex; flex-direction: column; gap: 6px; }
+.etapas-list { display: flex; flex-direction: column; gap: 5px; }
 .etapa {
-  display: flex; align-items: center; gap: 12px;
+  display: flex; align-items: center; gap: 10px;
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 8px; padding: 10px 16px;
+  border-radius: 8px; padding: 9px 13px;
   position: relative; overflow: hidden;
-  transition: border-color 0.2s;
 }
-.etapa:hover { border-color: var(--etapa-col, var(--accent)); }
 .etapa::before {
   content: ''; position: absolute; left: 0; top: 0; bottom: 0;
   width: 3px; background: var(--etapa-col, var(--accent));
 }
-.etapa-num {
-  font-family: 'Space Mono', monospace; font-size: 10px;
-  color: var(--muted); min-width: 20px;
-}
-.etapa-name { font-size: 13px; font-weight: 700; color: var(--white); flex: 1; }
+.etapa-num { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); min-width: 18px; }
+.etapa-name { font-size: clamp(11px, 2vw, 13px); font-weight: 700; color: var(--white); flex: 1; }
 .etapa-pct { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; }
 
-/* ─── SLIDE 5 — OFERTA ─── */
-.oferta-layout { position: relative; z-index: 1; max-width: 1100px; width: 100%; }
-.oferta-header { margin-bottom: 48px; }
+/* ══════════════════
+   S5 — OFERTA
+══════════════════ */
+.oferta-wrap { position: relative; z-index: 1; width: 100%; max-width: 1100px; }
+.oferta-hdr { margin-bottom: 18px; }
 .oferta-title {
-  font-size: clamp(40px, 5.5vw, 70px);
-  font-weight: 900; letter-spacing: -0.03em; color: var(--white);
-  line-height: 0.95; margin-bottom: 16px;
+  font-size: clamp(26px, 7vw, 66px);
+  font-weight: 900; letter-spacing: -.03em; color: var(--white);
+  line-height: .92; margin-bottom: 10px;
 }
 .oferta-title span { color: var(--accent); }
-.oferta-sub { font-size: 16px; color: var(--muted); max-width: 560px; line-height: 1.6; }
-.oferta-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.oferta-sub { font-size: clamp(12px, 2vw, 14px); color: var(--muted); max-width: 520px; line-height: 1.6; }
+.oferta-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px;
+}
+@media (min-width: 640px) { .oferta-grid { grid-template-columns: repeat(4, 1fr); } }
 .oferta-el {
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 22px 18px;
+  border-radius: 11px; padding: 16px 13px;
   position: relative; overflow: hidden;
-  transition: transform 0.25s, border-color 0.25s;
+  transition: transform .25s, border-color .25s;
 }
-.oferta-el:hover { transform: translateY(-4px); border-color: var(--el-col, var(--accent)); }
+@media (hover: hover) { .oferta-el:hover { transform: translateY(-4px); border-color: var(--el-col, var(--accent)); } }
 .oferta-el::before {
-  content: ''; position: absolute;
-  top: 0; left: 0; right: 0; height: 2px;
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
   background: var(--el-col, var(--accent));
 }
-.oferta-el-ico { font-size: 26px; margin-bottom: 12px; }
-.oferta-el-name { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
-.oferta-el-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.oferta-el-ico { font-size: 20px; margin-bottom: 8px; }
+.oferta-el-name { font-size: clamp(10px, 1.8vw, 13px); font-weight: 700; color: var(--white); margin-bottom: 4px; }
+.oferta-el-desc { font-size: 11px; color: var(--muted); line-height: 1.45; }
 
-/* ─── SLIDE 6 — FÓRMULA ANIMADA ─── */
-#s6 {}
-.formula-layout {
+/* ══════════════════
+   S6 — FÓRMULA
+══════════════════ */
+.formula-wrap {
   position: relative; z-index: 1;
   display: flex; flex-direction: column;
   align-items: center; text-align: center;
-  max-width: 900px;
+  width: 100%; max-width: 900px;
+  padding-top: 10px;
 }
+.formula-title {
+  font-size: clamp(24px, 7vw, 78px);
+  font-weight: 900; letter-spacing: -.04em; color: var(--white);
+  line-height: .9; margin-bottom: 0;
+}
+.formula-title .hl { color: var(--accent); }
 .formula-eq {
   display: flex; align-items: center; justify-content: center;
-  gap: 16px; flex-wrap: wrap; margin: 40px 0;
+  gap: 8px; flex-wrap: wrap; margin: 22px 0;
 }
 .feq-part {
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 20px 24px; text-align: center;
+  border-radius: 12px; padding: 14px 16px; text-align: center;
   animation: floatCard 4s ease-in-out infinite;
+  min-width: 80px;
 }
-.feq-part:nth-child(1) { animation-delay: 0s; }
-.feq-part:nth-child(3) { animation-delay: 0.8s; }
-.feq-part:nth-child(5) { animation-delay: 1.6s; }
-.feq-part:nth-child(7) { animation-delay: 2.4s; }
-
-@keyframes floatCard {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-.feq-val {
-  font-size: clamp(16px, 2.2vw, 22px); font-weight: 800;
-  display: block; line-height: 1.1;
-}
-.feq-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 6px; }
+.feq-part:nth-child(1){animation-delay:0s}
+.feq-part:nth-child(3){animation-delay:.8s}
+.feq-part:nth-child(5){animation-delay:1.6s}
+.feq-part:nth-child(7){animation-delay:2.4s}
+@keyframes floatCard { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.feq-val { font-size: clamp(12px, 2.5vw, 20px); font-weight: 800; display: block; line-height: 1.2; }
+.feq-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-top: 5px; }
 .feq-op {
-  font-size: 32px; font-weight: 200; color: var(--border);
+  font-size: clamp(20px, 3vw, 30px); font-weight: 200; color: var(--border);
   animation: opPulse 2s ease-in-out infinite;
 }
-@keyframes opPulse { 0%,100%{opacity:0.4} 50%{opacity:1; color: var(--accent);} }
-
+@keyframes opPulse { 0%,100%{opacity:.4} 50%{opacity:1;color:var(--accent)} }
 .feq-result {
-  background: rgba(200,241,53,0.08);
-  border: 1px solid rgba(200,241,53,0.3) !important;
+  background: rgba(200,241,53,.08);
+  border: 1px solid rgba(200,241,53,.3) !important;
   animation: resultGlow 3s ease-in-out infinite !important;
 }
 .feq-result .feq-val { color: var(--accent); }
 @keyframes resultGlow {
-  0%,100% { box-shadow: 0 0 0 0 rgba(200,241,53,0); transform: translateY(0); }
-  50% { box-shadow: 0 0 40px 4px rgba(200,241,53,0.15); transform: translateY(-8px); }
+  0%,100%{box-shadow:0 0 0 0 rgba(200,241,53,0);transform:translateY(0)}
+  50%{box-shadow:0 0 28px 4px rgba(200,241,53,.15);transform:translateY(-8px)}
 }
-.formula-note { font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 600px; }
+.formula-note { font-size: clamp(12px, 2vw, 14px); color: var(--muted); line-height: 1.7; max-width: 560px; }
 
-/* ─── SLIDE 7 — CTA / IG ─── */
-.cta-layout {
+/* ══════════════════
+   S7 — CTA / IG
+══════════════════ */
+.cta-wrap {
   position: relative; z-index: 1;
   display: flex; flex-direction: column;
   align-items: center; text-align: center;
+  width: 100%; max-width: 700px;
+  padding-top: 10px;
 }
 .cta-big {
-  font-size: clamp(40px, 6vw, 80px);
-  font-weight: 900; line-height: 0.95;
-  letter-spacing: -0.04em; margin-bottom: 36px;
+  font-size: clamp(28px, 8vw, 80px);
+  font-weight: 900; line-height: .92;
+  letter-spacing: -.04em; margin-bottom: 24px;
 }
 .cta-line1 { display: block; color: var(--white); }
 .cta-line2 { display: block; color: var(--accent); }
-
-.cta-bottom {
-  display: flex; align-items: center; gap: 40px;
-  margin-bottom: 32px;
+.cta-row {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 14px;
+  width: 100%; margin-bottom: 18px;
 }
-
+@media (min-width: 560px) { .cta-row { flex-direction: row; justify-content: center; gap: 20px; } }
 .ig-block {
-  display: flex; align-items: center; gap: 20px;
+  display: flex; align-items: center; gap: 14px;
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 16px; padding: 24px 36px;
-  cursor: pointer; transition: all 0.3s;
+  border-radius: 14px; padding: 18px 24px;
+  cursor: pointer; transition: all .3s;
+  text-align: left; width: 100%; max-width: 320px;
 }
-.ig-block:hover { border-color: var(--accent); transform: translateY(-3px); }
-.ig-at { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; color: var(--accent); }
-.ig-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.15em; margin-top: 4px; }
-.ig-icon { font-size: 36px; opacity: 0.6; }
-
+@media (hover: hover) { .ig-block:hover { border-color: var(--accent); transform: translateY(-3px); } }
+.ig-block:active { border-color: var(--accent); }
+.ig-at { font-family: 'Space Mono', monospace; font-size: clamp(15px, 4vw, 21px); font-weight: 700; color: var(--accent); }
+.ig-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .13em; margin-top: 3px; }
+.ig-icon { font-size: 28px; opacity: .6; margin-left: auto; }
 .qr-block {
   background: var(--card); border: 1px solid var(--border);
-  border-radius: 16px; padding: 20px;
-  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  border-radius: 14px; padding: 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+  flex-shrink: 0;
 }
-.qr-block canvas { border-radius: 8px; }
-.qr-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
-
-.cta-sub { font-size: 15px; color: var(--muted); max-width: 500px; line-height: 1.65; }
+.qr-inner { background: white; padding: 7px; border-radius: 7px; }
+.qr-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+.cta-sub { font-size: clamp(12px, 2vw, 14px); color: var(--muted); max-width: 420px; line-height: 1.65; }
 </style>
 </head>
 <body>
@@ -500,55 +485,32 @@ nav {
   <div class="progress-fill" id="progress" style="width:12.5%"></div>
 </div>
 
-<div class="dots" id="dots"></div>
+<div class="deck">
 
-<div class="arrows">
-  <div class="arrow-btn" id="prev" onclick="navigate(-1)">←</div>
-  <div class="arrow-btn" id="next" onclick="navigate(1)">→</div>
-</div>
-
-<div class="hint" id="hint">
-  <span class="key">←</span> <span class="key">→</span> navegar
-</div>
-
-<div class="deck" id="deck">
-
-  <!-- ════════ SLIDE 0 — CAPA ════════ -->
+  <!-- S0 — CAPA -->
   <div class="slide active" id="s0">
-    <div class="grid-bg"></div>
-    <div class="noise"></div>
-    <div class="glow-orb" style="width:600px;height:600px;background:var(--accent);left:-100px;top:-100px;"></div>
-    <div class="bg-num">01</div>
+    <div class="grid-bg"></div><div class="noise"></div>
+    <div class="glow-orb" style="width:500px;height:500px;background:var(--accent);left:-140px;top:-140px;"></div>
     <div class="capa-content">
       <div class="badge anim-item"><span class="badge-dot"></span>Masterclass · Vendas B2B e B2C</div>
-      <h1 class="big-title anim-item">
-        <span class="capa-line">Estruturação</span>
-        <span class="capa-line hl">Comercial</span>
-      </h1>
-      <p class="capa-desc anim-item">
-        Do primeiro contato ao fechamento — entenda os três pilares que transformam esforço em processo e processo em crescimento previsível.
-      </p>
+      <h1 class="capa-title anim-item">Estruturação<span class="hl">Comercial</span></h1>
+      <p class="capa-desc anim-item">Do primeiro contato ao fechamento — entenda os três pilares que transformam esforço em processo e processo em crescimento previsível.</p>
     </div>
   </div>
 
-  <!-- ════════ SLIDE 1 — GRÁFICO DE CRESCIMENTO ════════ -->
+  <!-- S1 — GRÁFICO -->
   <div class="slide" id="s1">
-    <div class="grid-bg"></div>
-    <div class="noise"></div>
-    <div class="glow-orb" style="width:500px;height:500px;background:var(--accent);right:-80px;bottom:-80px;"></div>
-    <div class="chart-layout">
-      <div class="chart-left">
+    <div class="grid-bg"></div><div class="noise"></div>
+    <div class="glow-orb" style="width:380px;height:380px;background:var(--accent);right:-80px;bottom:-60px;"></div>
+    <div class="chart-wrap">
+      <div>
         <div class="label anim-item">O que é possível</div>
         <h2 class="chart-left-title anim-item">
-          <span style="color:var(--white)">De</span>
-          <span style="color:var(--accent)"> R$200k</span><br>
-          <span style="color:var(--white)">a</span>
-          <span style="color:var(--accent)"> R$2,5M</span><br>
+          <span style="color:var(--white)">De</span> <span style="color:var(--accent)">R$200k</span><br>
+          <span style="color:var(--white)">a</span> <span style="color:var(--accent)">R$2,5M</span><br>
           <span style="color:var(--white)">em 90 dias</span>
         </h2>
-        <p class="chart-left-desc anim-item">
-          Quando as três engrenagens funcionam juntas, o crescimento deixa de ser acidental e passa a ser previsível. Veja a curva:
-        </p>
+        <p class="chart-left-desc anim-item">Quando as três engrenagens funcionam juntas, o crescimento deixa de ser acidental e passa a ser previsível.</p>
         <div class="chart-milestones anim-item">
           <div class="milestone">
             <div class="milestone-dot" style="background:var(--muted)"></div>
@@ -572,26 +534,20 @@ nav {
           </div>
         </div>
       </div>
-      <div class="chart-area anim-item">
-        <canvas id="growth-chart"></canvas>
-      </div>
+      <div class="anim-item"><canvas id="growth-chart"></canvas></div>
     </div>
   </div>
 
-  <!-- ════════ SLIDE 2 — TRÊS ENGRENAGENS ════════ -->
+  <!-- S2 — ENGRENAGENS -->
   <div class="slide" id="s2">
-    <div class="grid-bg"></div>
-    <div class="noise"></div>
+    <div class="grid-bg"></div><div class="noise"></div>
     <div class="tres-layout">
-      <h2 class="tres-title anim-item">
-        As três <span style="color:var(--accent)">engrenagens</span><br>do comercial
-      </h2>
-      <div class="engrenagens-cards anim-item">
-
+      <h2 class="tres-title anim-item">As três <span style="color:var(--accent)">engrenagens</span><br>do comercial</h2>
+      <div class="eng-cards anim-item">
         <div class="eng-card">
           <div class="eng-topbar" style="background:#F97316"></div>
-          <div class="eng-icon-wrap" style="background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.2)">
-            <svg class="gear-rotate-cw" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <div class="eng-icon-wrap" style="background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.25)">
+            <svg class="gear-rotate-cw" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"/>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
             </svg>
@@ -599,23 +555,21 @@ nav {
           <div class="eng-num" style="color:#F97316">01</div>
           <div class="eng-title">Canais de<br>Aquisição</div>
         </div>
-
         <div class="eng-card">
           <div class="eng-topbar" style="background:#22C55E"></div>
-          <div class="eng-icon-wrap" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.2)">
-            <svg class="gear-rotate-ccw" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <div class="eng-icon-wrap" style="background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.25)">
+            <svg class="gear-rotate-ccw" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"/>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
             </svg>
           </div>
           <div class="eng-num" style="color:#22C55E">02</div>
-          <div class="eng-title" style="color:#22C55E">Processo<br>Comercial</div>
+          <div class="eng-title">Processo<br>Comercial</div>
         </div>
-
         <div class="eng-card">
           <div class="eng-topbar" style="background:#8B5CF6"></div>
-          <div class="eng-icon-wrap" style="background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.2)">
-            <svg class="gear-rotate-cw2" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <div class="eng-icon-wrap" style="background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.25)">
+            <svg class="gear-rotate-cw2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"/>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
             </svg>
@@ -623,25 +577,23 @@ nav {
           <div class="eng-num" style="color:#8B5CF6">03</div>
           <div class="eng-title">Construção<br>de Oferta</div>
         </div>
-
       </div>
     </div>
   </div>
 
-  <!-- ════════ SLIDE 3 — CANAIS DE AQUISIÇÃO ════════ -->
+  <!-- S3 — CANAIS -->
   <div class="slide" id="s3">
-    <div class="grid-bg"></div>
-    <div class="noise"></div>
-    <div class="glow-orb" style="width:400px;height:400px;background:var(--accent);left:-60px;top:40px;"></div>
-    <div class="canais-layout">
-      <div class="canais-header">
+    <div class="grid-bg"></div><div class="noise"></div>
+    <div class="glow-orb" style="width:340px;height:340px;background:var(--accent);left:-70px;top:-40px;"></div>
+    <div class="canais-wrap">
+      <div class="canais-hdr">
         <div class="label anim-item">Engrenagem 01</div>
         <h2 class="canais-title anim-item">Canais de <span>Aquisição</span></h2>
         <p class="canais-sub anim-item">Canal é qualquer meio pelo qual um cliente descobre sua empresa. Escolher errado custa caro. Escolher certo é vantagem competitiva.</p>
       </div>
       <div class="canais-grid anim-item">
         <div class="canal">
-          <div class="canal-tag" style="background:rgba(200,241,53,0.12);color:var(--accent)">Chegada Espontânea</div>
+          <div class="canal-tag" style="background:rgba(200,241,53,.12);color:var(--accent)">Chegada Espontânea</div>
           <div class="canal-name">Inbound</div>
           <div class="canal-slogan">O cliente chega até você.</div>
           <ul class="canal-items">
@@ -653,7 +605,7 @@ nav {
           <div class="canal-bar" style="background:var(--accent)"></div>
         </div>
         <div class="canal">
-          <div class="canal-tag" style="background:rgba(139,92,246,0.12);color:var(--purple)">Prospecção Ativa</div>
+          <div class="canal-tag" style="background:rgba(139,92,246,.12);color:var(--purple)">Prospecção Ativa</div>
           <div class="canal-name">Outbound</div>
           <div class="canal-slogan">Você vai até o cliente.</div>
           <ul class="canal-items">
@@ -665,7 +617,7 @@ nav {
           <div class="canal-bar" style="background:var(--purple)"></div>
         </div>
         <div class="canal">
-          <div class="canal-tag" style="background:rgba(249,115,22,0.12);color:var(--orange)">Terceiros Indicam</div>
+          <div class="canal-tag" style="background:rgba(249,115,22,.12);color:var(--orange)">Terceiros Indicam</div>
           <div class="canal-name">Parcerias</div>
           <div class="canal-slogan">Alguém te apresenta.</div>
           <ul class="canal-items">
@@ -680,133 +632,119 @@ nav {
     </div>
   </div>
 
-  <!-- ════════ SLIDE 4 — PROCESSO COMERCIAL ════════ -->
+  <!-- S4 — PROCESSO -->
   <div class="slide" id="s4">
-    <div class="grid-bg"></div>
-    <div class="noise"></div>
-    <div class="glow-orb" style="width:450px;height:450px;background:var(--purple);right:-60px;top:60px;"></div>
-    <div class="processo-layout">
-      <div class="processo-left">
+    <div class="grid-bg"></div><div class="noise"></div>
+    <div class="glow-orb" style="width:380px;height:380px;background:var(--purple);right:-60px;top:20px;"></div>
+    <div class="processo-wrap">
+      <div>
         <div class="label anim-item">Engrenagem 02</div>
         <h2 class="processo-title anim-item">Processo <span>Comercial</span></h2>
         <p class="processo-desc anim-item">7 etapas que transformam um lead frio em cliente — de forma sistemática e mensurável.</p>
-
-        <div class="conversion-formula anim-item">
+        <div class="conv-formula anim-item">
           <div class="conv-label">Como calcular taxa de conversão</div>
           <div class="conv-eq">
             <span class="hl">Taxa (%) = </span><span>(Saída ÷ Entrada) × 100</span><br>
-            <span class="muted">Ex: 37 fechados ÷ 1000 abordados × 100 = </span><span class="hl">3,7%</span><br>
-            <span class="muted">Entre etapas: fechados ÷ negociações × 100</span>
+            <span class="mt">Ex: 50 fechados ÷ 1000 leads × 100 = </span><span class="hl">5%</span><br>
+            <span class="mt">Entre etapas: fechados ÷ negociações × 100</span>
           </div>
         </div>
       </div>
-
       <div class="etapas-list anim-item">
         <div class="etapa" style="--etapa-col:#38BDF8">
-          <div class="etapa-num">01</div>
-          <div class="etapa-name">Prospecção</div>
+          <div class="etapa-num">01</div><div class="etapa-name">Prospecção</div>
           <div class="etapa-pct" style="color:#38BDF8">→</div>
         </div>
         <div class="etapa" style="--etapa-col:#C8F135">
-          <div class="etapa-num">02</div>
-          <div class="etapa-name">Abordagem</div>
-          <div class="etapa-pct" style="color:#C8F135">40%</div>
+          <div class="etapa-num">02</div><div class="etapa-name">Abordagem</div>
+          <div class="etapa-pct" style="color:#C8F135">60%</div>
         </div>
         <div class="etapa" style="--etapa-col:#8B5CF6">
-          <div class="etapa-num">03</div>
-          <div class="etapa-name">Apresentação</div>
-          <div class="etapa-pct" style="color:#8B5CF6">65%</div>
+          <div class="etapa-num">03</div><div class="etapa-name">Apresentação</div>
+          <div class="etapa-pct" style="color:#8B5CF6">67%</div>
         </div>
         <div class="etapa" style="--etapa-col:#F97316">
-          <div class="etapa-num">04</div>
-          <div class="etapa-name">Geração de Relacionamento</div>
-          <div class="etapa-pct" style="color:#F97316">75%</div>
+          <div class="etapa-num">04</div><div class="etapa-name">Geração de Relacionamento</div>
+          <div class="etapa-pct" style="color:#F97316">65%</div>
         </div>
         <div class="etapa" style="--etapa-col:#38BDF8">
-          <div class="etapa-num">05</div>
-          <div class="etapa-name">Follow</div>
-          <div class="etapa-pct" style="color:#38BDF8">→</div>
+          <div class="etapa-num">05</div><div class="etapa-name">Follow</div>
+          <div class="etapa-pct" style="color:#38BDF8">77%</div>
         </div>
         <div class="etapa" style="--etapa-col:#EAB308">
-          <div class="etapa-num">06</div>
-          <div class="etapa-name">Negociação</div>
-          <div class="etapa-pct" style="color:#EAB308">60%</div>
+          <div class="etapa-num">06</div><div class="etapa-name">Negociação</div>
+          <div class="etapa-pct" style="color:#EAB308">55%</div>
         </div>
         <div class="etapa" style="--etapa-col:#22C55E">
-          <div class="etapa-num">07</div>
-          <div class="etapa-name">Fechamento</div>
-          <div class="etapa-pct" style="color:#22C55E">35%</div>
+          <div class="etapa-num">07</div><div class="etapa-name">Fechamento</div>
+          <div class="etapa-pct" style="color:#22C55E">45%</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ════════ SLIDE 5 — CONSTRUÇÃO DE OFERTA ════════ -->
+  <!-- S5 — OFERTA -->
   <div class="slide" id="s5">
-    <div class="grid-bg"></div>
-    <div class="noise"></div>
-    <div class="glow-orb" style="width:400px;height:400px;background:var(--orange);right:-60px;bottom:-60px;"></div>
-    <div class="oferta-layout">
-      <div class="oferta-header">
+    <div class="grid-bg"></div><div class="noise"></div>
+    <div class="glow-orb" style="width:340px;height:340px;background:var(--orange);right:-50px;bottom:-40px;"></div>
+    <div class="oferta-wrap">
+      <div class="oferta-hdr">
         <div class="label anim-item">Engrenagem 03</div>
         <h2 class="oferta-title anim-item">Construção de <span>Oferta</span></h2>
-        <p class="oferta-sub anim-item">Pare de vender o que você faz. Comece a vender o que o cliente ganha. Uma oferta irresistível tem estrutura — não improviso.</p>
+        <p class="oferta-sub anim-item">Pare de vender o que você faz. Comece a vender o que o cliente ganha.</p>
       </div>
       <div class="oferta-grid anim-item">
         <div class="oferta-el" style="--el-col:var(--accent)">
           <div class="oferta-el-ico">🎯</div>
           <div class="oferta-el-name">Resultado Prometido</div>
-          <div class="oferta-el-desc">Específico, mensurável e com prazo. O "depois" que o cliente compra.</div>
+          <div class="oferta-el-desc">Específico, mensurável e com prazo.</div>
         </div>
         <div class="oferta-el" style="--el-col:var(--blue)">
           <div class="oferta-el-ico">⏱️</div>
           <div class="oferta-el-name">Prazo de Entrega</div>
-          <div class="oferta-el-desc">Promessa sem prazo é vaga. O prazo cria urgência e credibilidade.</div>
+          <div class="oferta-el-desc">O prazo cria urgência e credibilidade.</div>
         </div>
         <div class="oferta-el" style="--el-col:var(--purple)">
           <div class="oferta-el-ico">🛡️</div>
           <div class="oferta-el-name">Redução de Risco</div>
-          <div class="oferta-el-desc">Garantia sólida. Quem assume o risco fecha mais — sempre.</div>
+          <div class="oferta-el-desc">Garantia sólida. Quem assume o risco fecha mais.</div>
         </div>
         <div class="oferta-el" style="--el-col:var(--orange)">
           <div class="oferta-el-ico">🧩</div>
           <div class="oferta-el-name">Facilidade</div>
-          <div class="oferta-el-desc">Quanto menos esforço o cliente coloca, maior o valor percebido.</div>
+          <div class="oferta-el-desc">Menos esforço = maior valor percebido.</div>
         </div>
         <div class="oferta-el" style="--el-col:var(--green)">
           <div class="oferta-el-ico">📦</div>
           <div class="oferta-el-name">Bônus e Extras</div>
-          <div class="oferta-el-desc">Elementos que multiplicam o valor percebido sem aumentar o custo.</div>
+          <div class="oferta-el-desc">Multiplicam o valor sem aumentar o custo.</div>
         </div>
         <div class="oferta-el" style="--el-col:#EAB308">
           <div class="oferta-el-ico">⚡</div>
           <div class="oferta-el-name">Urgência Real</div>
-          <div class="oferta-el-desc">Motivo genuíno para decidir agora — não um gatilho falso.</div>
+          <div class="oferta-el-desc">Motivo genuíno para decidir agora.</div>
         </div>
         <div class="oferta-el" style="--el-col:#EC4899">
           <div class="oferta-el-ico">🏆</div>
           <div class="oferta-el-name">Prova Social</div>
-          <div class="oferta-el-desc">Cases com resultados numéricos. Quanto mais específico, mais convence.</div>
+          <div class="oferta-el-desc">Cases com números reais convencem mais.</div>
         </div>
         <div class="oferta-el" style="--el-col:var(--red)">
           <div class="oferta-el-ico">💰</div>
           <div class="oferta-el-name">Preço por Último</div>
-          <div class="oferta-el-desc">Preço vem depois do valor. Nunca antes. Essa ordem muda tudo.</div>
+          <div class="oferta-el-desc">Preço vem depois do valor. Sempre.</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ════════ SLIDE 6 — FÓRMULA ANIMADA ════════ -->
+  <!-- S6 — FÓRMULA -->
   <div class="slide" id="s6">
-    <div class="grid-bg"></div>
-    <div class="noise"></div>
-    <div class="glow-orb" style="width:700px;height:700px;background:var(--accent);left:50%;top:50%;transform:translate(-50%,-50%);"></div>
-    <div class="formula-layout">
+    <div class="grid-bg"></div><div class="noise"></div>
+    <div class="glow-orb" style="width:560px;height:560px;background:var(--accent);left:50%;top:50%;transform:translate(-50%,-50%);"></div>
+    <div class="formula-wrap">
       <div class="label anim-item">A síntese</div>
-      <h2 class="big-title anim-item" style="font-size:clamp(42px,6vw,82px)">
-        A equação do<br><span class="hl">crescimento previsível</span>
-      </h2>
+      <h2 class="formula-title anim-item">A equação do<br><span class="hl">crescimento previsível</span></h2>
       <div class="formula-eq anim-item">
         <div class="feq-part">
           <span class="feq-val" style="color:var(--accent)">Canais<br>Certos</span>
@@ -828,25 +766,21 @@ nav {
           <span class="feq-label">crescimento previsível</span>
         </div>
       </div>
-      <p class="formula-note anim-item">
-        Com as três engrenagens funcionando juntas, você para de depender de sorte ou de pessoas específicas — e começa a ter um sistema que gera resultados independente de quem está vendendo.
-      </p>
+      <p class="formula-note anim-item">Com as três engrenagens funcionando juntas, você para de depender de sorte — e começa a ter um sistema que gera resultados independente de quem está vendendo.</p>
     </div>
   </div>
 
-  <!-- ════════ SLIDE 7 — CTA / IG ════════ -->
+  <!-- S7 — CTA -->
   <div class="slide" id="s7">
-    <div class="grid-bg"></div>
-    <div class="noise"></div>
-    <div class="glow-orb" style="width:600px;height:600px;background:var(--accent);left:50%;top:50%;transform:translate(-50%,-50%);"></div>
-    <div class="bg-num" style="right:auto;left:-2vw;bottom:-6vh;opacity:0.015">FIM</div>
-    <div class="cta-layout">
+    <div class="grid-bg"></div><div class="noise"></div>
+    <div class="glow-orb" style="width:480px;height:480px;background:var(--accent);left:50%;top:50%;transform:translate(-50%,-50%);"></div>
+    <div class="cta-wrap">
       <div class="badge anim-item"><span class="badge-dot"></span>Continue aprendendo</div>
       <h2 class="cta-big anim-item">
         <span class="cta-line1">Gostou do que ouviu?</span>
         <span class="cta-line2">Me siga no IG!</span>
       </h2>
-      <div class="cta-bottom anim-item">
+      <div class="cta-row anim-item">
         <div class="ig-block" onclick="window.open('https://www.instagram.com/gustavoobenedetti','_blank')">
           <div>
             <div class="ig-at">@gustavoobenedetti</div>
@@ -855,28 +789,32 @@ nav {
           <div class="ig-icon">📲</div>
         </div>
         <div class="qr-block">
-          <canvas id="qr-canvas" width="120" height="120"></canvas>
+          <div class="qr-inner"><canvas id="qr-canvas" width="100" height="100"></canvas></div>
           <div class="qr-label">Aponte a câmera</div>
         </div>
       </div>
-      <p class="cta-sub anim-item">
-        Conteúdo prático sobre estruturação comercial, processo de vendas e construção de oferta — todo dia no Instagram.
-      </p>
+      <p class="cta-sub anim-item">Conteúdo prático sobre estruturação comercial, processo de vendas e construção de oferta — todo dia no Instagram.</p>
     </div>
   </div>
 
 </div><!-- /deck -->
 
+<div class="bottom-bar">
+  <div class="dots-row" id="dots"></div>
+  <div class="nav-btns">
+    <div class="arrow-btn" onclick="navigate(-1)">←</div>
+    <div class="arrow-btn" onclick="navigate(1)">→</div>
+  </div>
+</div>
+
 <script>
-/* ─── NAVIGATION ─── */
 const TOTAL = 8;
-let current = 0;
-let isAnimating = false;
+let current = 0, busy = false;
 
 const cursorEl = document.getElementById('cursor');
-document.addEventListener('mousemove', e => {
+if (cursorEl) document.addEventListener('mousemove', e => {
   cursorEl.style.left = e.clientX + 'px';
-  cursorEl.style.top = e.clientY + 'px';
+  cursorEl.style.top  = e.clientY + 'px';
 });
 
 const dotsEl = document.getElementById('dots');
@@ -888,262 +826,162 @@ for (let i = 0; i < TOTAL; i++) {
 }
 
 function goTo(target) {
-  if (isAnimating || target === current) return;
-  if (target < 0 || target >= TOTAL) return;
-  isAnimating = true;
+  if (busy || target === current || target < 0 || target >= TOTAL) return;
+  busy = true;
   const dir = target > current ? 1 : -1;
   const slides = document.querySelectorAll('.slide');
-  const from = slides[current];
-  const to = slides[target];
+  const from = slides[current], to = slides[target];
   from.classList.remove('active');
-  from.classList.add(dir > 0 ? 'exit-left' : 'exit-right');
-  to.style.transform = dir > 0 ? 'translateX(60px)' : 'translateX(-60px)';
-  to.style.opacity = '0';
-  to.style.pointerEvents = 'none';
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      to.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
-      to.style.transform = 'translateX(0)';
-      to.style.opacity = '1';
-      to.style.pointerEvents = 'all';
-      to.classList.add('active');
-      setTimeout(() => {
-        from.classList.remove('exit-left', 'exit-right');
-        to.style.transition = '';
-        to.style.transform = '';
-        to.style.opacity = '';
-        isAnimating = false;
-        if (target === 1) drawGrowthChart();
-        if (target === 7) drawQR();
-      }, 480);
-    });
-  });
+  from.classList.add(dir > 0 ? 'exit-l' : 'exit-r');
+  to.style.transform = dir > 0 ? 'translateX(48px)' : 'translateX(-48px)';
+  to.style.opacity = '0'; to.style.pointerEvents = 'none';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    to.style.transition = 'opacity .42s ease, transform .42s ease';
+    to.style.transform = 'translateX(0)';
+    to.style.opacity = '1';
+    to.style.pointerEvents = 'all';
+    to.classList.add('active');
+    setTimeout(() => {
+      from.classList.remove('exit-l','exit-r');
+      to.style.transition = to.style.transform = to.style.opacity = '';
+      busy = false;
+      if (target === 1) drawChart();
+      if (target === 7) drawQR();
+    }, 440);
+  }));
   current = target;
   updateUI();
 }
 
-function navigate(dir) { goTo(current + dir); }
+function navigate(d) { goTo(current + d); }
 
 function updateUI() {
   document.getElementById('counter').textContent =
-    String(current + 1).padStart(2, '0') + ' / ' + String(TOTAL).padStart(2, '0');
-  document.getElementById('progress').style.width = ((current + 1) / TOTAL * 100) + '%';
-  document.querySelectorAll('.dot').forEach((d, i) => {
-    d.classList.toggle('active', i === current);
-  });
-  if (current > 0) document.getElementById('hint').classList.add('hidden');
+    String(current+1).padStart(2,'0') + ' / ' + String(TOTAL).padStart(2,'0');
+  document.getElementById('progress').style.width = ((current+1)/TOTAL*100) + '%';
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===current));
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
-    e.preventDefault(); navigate(1);
-  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-    e.preventDefault(); navigate(-1);
-  } else if (e.key === 'Home') { goTo(0); }
-    else if (e.key === 'End') { goTo(TOTAL - 1); }
+  if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); navigate(1); }
+  else if (['ArrowLeft','ArrowUp'].includes(e.key)) { e.preventDefault(); navigate(-1); }
+  else if (e.key==='Home') goTo(0);
+  else if (e.key==='End')  goTo(TOTAL-1);
 });
 
-let touchX = 0;
-document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+let tx=0, ty=0;
+document.addEventListener('touchstart', e => { tx=e.touches[0].clientX; ty=e.touches[0].clientY; }, {passive:true});
 document.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - touchX;
-  if (Math.abs(dx) > 50) navigate(dx < 0 ? 1 : -1);
-}, { passive: true });
+  const dx = e.changedTouches[0].clientX - tx;
+  const dy = e.changedTouches[0].clientY - ty;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 44) navigate(dx < 0 ? 1 : -1);
+}, {passive:true});
 
-/* ─── GROWTH CHART ─── */
-let chartDrawn = false;
-function drawGrowthChart() {
-  if (chartDrawn) return;
-  chartDrawn = true;
+/* ── CHART ── */
+let chartDone = false;
+function drawChart() {
+  if (chartDone) return; chartDone = true;
   const canvas = document.getElementById('growth-chart');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.offsetWidth || 500;
-  const H = canvas.offsetHeight || 320;
-  canvas.width = W * 2; canvas.height = H * 2;
-  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-  ctx.scale(2, 2);
-
-  const pad = { top: 30, right: 30, bottom: 50, left: 70 };
-  const cw = W - pad.left - pad.right;
-  const ch = H - pad.top - pad.bottom;
-
-  const days = [0, 15, 30, 45, 60, 75, 90];
-  const values = [200000, 320000, 600000, 850000, 1300000, 1850000, 2500000];
-  const minV = 0, maxV = 2700000;
-
-  function xPos(d) { return pad.left + (d / 90) * cw; }
-  function yPos(v) { return pad.top + ch - ((v - minV) / (maxV - minV)) * ch; }
-
-  // Grid lines
-  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-  ctx.lineWidth = 1;
-  [0, 500000, 1000000, 1500000, 2000000, 2500000].forEach(v => {
-    const y = yPos(v);
-    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cw, y); ctx.stroke();
-    ctx.fillStyle = '#555';
-    ctx.font = '10px Space Mono, monospace';
-    ctx.textAlign = 'right';
-    ctx.fillText(v >= 1000000 ? 'R$' + (v/1000000).toFixed(1) + 'M' : 'R$' + (v/1000) + 'k', pad.left - 8, y + 4);
-  });
-
-  // X axis labels
-  [0, 30, 60, 90].forEach(d => {
-    const x = xPos(d);
-    ctx.fillStyle = '#555';
-    ctx.font = '10px Space Mono, monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText(d + ' dias', x, pad.top + ch + 20);
-  });
-
-  // Gradient fill
-  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + ch);
-  grad.addColorStop(0, 'rgba(200,241,53,0.3)');
-  grad.addColorStop(1, 'rgba(200,241,53,0)');
-  ctx.beginPath();
-  ctx.moveTo(xPos(0), yPos(0));
-  days.forEach((d, i) => ctx.lineTo(xPos(d), yPos(values[i])));
-  ctx.lineTo(xPos(90), yPos(0));
-  ctx.closePath();
-  ctx.fillStyle = grad;
-  ctx.fill();
-
-  // Curve line — animate
-  let progress = 0;
-  const totalPoints = days.length;
-  function animate() {
-    ctx.clearRect(0, 0, W, H);
-
-    // Redraw grid
-    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-    ctx.lineWidth = 1;
-    [0, 500000, 1000000, 1500000, 2000000, 2500000].forEach(v => {
-      const y = yPos(v);
-      ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cw, y); ctx.stroke();
-      ctx.fillStyle = '#555';
-      ctx.font = '10px Space Mono, monospace';
-      ctx.textAlign = 'right';
-      ctx.fillText(v >= 1000000 ? 'R$' + (v/1000000).toFixed(1) + 'M' : 'R$' + (v/1000) + 'k', pad.left - 8, y + 4);
-    });
-    [0, 30, 60, 90].forEach(d => {
-      ctx.fillStyle = '#555';
-      ctx.font = '10px Space Mono, monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(d + ' dias', xPos(d), pad.top + ch + 20);
-    });
-
-    // Compute current visible segment
-    const p = Math.min(progress, 1);
-    const totalDist = 90;
-    const currentDay = p * totalDist;
-
-    function interpolate(day) {
-      for (let i = 0; i < days.length - 1; i++) {
-        if (day >= days[i] && day <= days[i+1]) {
-          const t = (day - days[i]) / (days[i+1] - days[i]);
-          return values[i] + t * (values[i+1] - values[i]);
+  function render() {
+    const W = canvas.offsetWidth || 400, H = canvas.offsetHeight || 240;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
+    const ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr);
+    const p = {t:22, r:18, b:38, l:52};
+    const cw = W-p.l-p.r, ch = H-p.t-p.b;
+    const days = [0,15,30,45,60,75,90];
+    const vals = [200000,350000,600000,860000,1300000,1860000,2500000];
+    const maxV = 2700000;
+    const xP = d => p.l + (d/90)*cw;
+    const yP = v => p.t + ch - (v/maxV)*ch;
+    function interp(day) {
+      for (let i=0;i<days.length-1;i++) {
+        if (day>=days[i] && day<=days[i+1]) {
+          const t=(day-days[i])/(days[i+1]-days[i]);
+          return vals[i]+t*(vals[i+1]-vals[i]);
         }
       }
-      return values[values.length - 1];
+      return vals[vals.length-1];
     }
-
-    // Fill
-    ctx.beginPath();
-    ctx.moveTo(xPos(0), yPos(0));
-    for (let d = 0; d <= currentDay; d += 1) {
-      ctx.lineTo(xPos(d), yPos(interpolate(d)));
+    const fs = Math.max(9, Math.round(W*.021));
+    const yLines = [0,500000,1000000,1500000,2000000,2500000];
+    function drawGrid() {
+      yLines.forEach(v => {
+        const y=yP(v);
+        ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(p.l,y); ctx.lineTo(p.l+cw,y); ctx.stroke();
+        ctx.fillStyle='#666'; ctx.font=`${fs}px 'Space Mono',monospace`; ctx.textAlign='right';
+        ctx.fillText(v>=1000000?'R$'+(v/1000000).toFixed(1)+'M':v>0?'R$'+(v/1000)+'k':'R$0', p.l-5, y+4);
+      });
+      [0,30,60,90].forEach(d => {
+        ctx.fillStyle='#666'; ctx.font=`${fs}px 'Space Mono',monospace`; ctx.textAlign='center';
+        ctx.fillText(d===0?'início':d+'d', xP(d), p.t+ch+22);
+      });
     }
-    ctx.lineTo(xPos(currentDay), yPos(0));
-    ctx.closePath();
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    // Line
-    ctx.beginPath();
-    ctx.moveTo(xPos(0), yPos(values[0]));
-    for (let d = 0; d <= currentDay; d += 1) {
-      ctx.lineTo(xPos(d), yPos(interpolate(d)));
-    }
-    ctx.strokeStyle = '#C8F135';
-    ctx.lineWidth = 2.5;
-    ctx.lineJoin = 'round';
-    ctx.stroke();
-
-    // Milestone dots
-    const milestoneColors = ['#555555', '#38BDF8', '#8B5CF6', '#C8F135'];
-    const milestoneDays = [0, 30, 60, 90];
-    milestoneDays.forEach((md, i) => {
-      if (md <= currentDay) {
-        const x = xPos(md); const y = yPos(values[days.indexOf(md)]);
-        ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2);
-        ctx.fillStyle = milestoneColors[i]; ctx.fill();
-        ctx.strokeStyle = '#070707'; ctx.lineWidth = 2; ctx.stroke();
+    const grad = ctx.createLinearGradient(0,p.t,0,p.t+ch);
+    grad.addColorStop(0,'rgba(200,241,53,.28)');
+    grad.addColorStop(1,'rgba(200,241,53,0)');
+    let prog=0;
+    function frame() {
+      ctx.clearRect(0,0,W,H);
+      drawGrid();
+      const cur = Math.min(prog,1)*90;
+      ctx.beginPath(); ctx.moveTo(xP(0),yP(0));
+      for (let d=0;d<=cur;d+=.5) ctx.lineTo(xP(d),yP(interp(d)));
+      ctx.lineTo(xP(cur),yP(0)); ctx.closePath();
+      ctx.fillStyle=grad; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(xP(0),yP(vals[0]));
+      for (let d=0;d<=cur;d+=.5) ctx.lineTo(xP(d),yP(interp(d)));
+      ctx.strokeStyle='#C8F135'; ctx.lineWidth=2.5; ctx.lineJoin='round'; ctx.stroke();
+      const mc=['#666','#38BDF8','#8B5CF6','#C8F135'];
+      [0,30,60,90].forEach((md,i) => {
+        if (md<=cur) {
+          const x=xP(md),y=yP(vals[days.indexOf(md)]);
+          ctx.beginPath(); ctx.arc(x,y,4.5,0,Math.PI*2);
+          ctx.fillStyle=mc[i]; ctx.fill();
+          ctx.strokeStyle='#070707'; ctx.lineWidth=2; ctx.stroke();
+        }
+      });
+      if (prog<1) {
+        const lx=xP(cur),ly=yP(interp(cur));
+        ctx.beginPath(); ctx.arc(lx,ly,5.5,0,Math.PI*2); ctx.fillStyle='#C8F135'; ctx.fill();
+        ctx.beginPath(); ctx.arc(lx,ly,9,0,Math.PI*2); ctx.fillStyle='rgba(200,241,53,.22)'; ctx.fill();
       }
-    });
-
-    // Glow dot at current position
-    if (p < 1) {
-      const cx2 = xPos(currentDay); const cy2 = yPos(interpolate(currentDay));
-      ctx.beginPath(); ctx.arc(cx2, cy2, 6, 0, Math.PI * 2);
-      ctx.fillStyle = '#C8F135'; ctx.fill();
-      ctx.beginPath(); ctx.arc(cx2, cy2, 10, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(200,241,53,0.3)'; ctx.fill();
+      prog+=.013;
+      if (prog<1) requestAnimationFrame(frame);
     }
-
-    progress += 0.012;
-    if (progress < 1) requestAnimationFrame(animate);
+    frame();
   }
-  animate();
+  canvas.offsetWidth===0 ? setTimeout(render,120) : render();
 }
 
-/* ─── QR CODE ─── */
-let qrDrawn = false;
+/* ── QR ── */
+let qrDone = false;
 function drawQR() {
-  if (qrDrawn) return;
-  qrDrawn = true;
+  if (qrDone) return; qrDone = true;
   const canvas = document.getElementById('qr-canvas');
   if (!canvas) return;
   const url = 'https://www.instagram.com/gustavoobenedetti';
-  generateQR(canvas, url);
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js';
+  s.onload = () => {
+    try { new QRious({ element: canvas, value: url, size: 100, background: '#ffffff', foreground: '#070707', level: 'H' }); }
+    catch(e) { fbQR(canvas, url); }
+  };
+  s.onerror = () => fbQR(canvas, url);
+  document.head.appendChild(s);
 }
-
-// Minimal QR code generator using a simple matrix approach
-// We'll use a data URI redirect approach with a pre-encoded QR
-function generateQR(canvas, url) {
-  const ctx = canvas.getContext('2d');
-  const size = 120;
-  canvas.width = size; canvas.height = size;
-
-  // Use QRious library approach via dynamic script
-  const script = document.createElement('script');
-  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js';
-  script.onload = function() {
-    const qr = new QRious({
-      element: canvas,
-      value: url,
-      size: size,
-      background: '#181818',
-      foreground: '#C8F135',
-      level: 'H'
-    });
-  };
-  script.onerror = function() {
-    // Fallback: draw a simple placeholder
-    ctx.fillStyle = '#181818';
-    ctx.fillRect(0, 0, size, size);
-    ctx.fillStyle = '#C8F135';
-    ctx.font = '9px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('@gustavoobenedetti', size/2, size/2 - 4);
-    ctx.fillText('no Instagram', size/2, size/2 + 10);
-  };
-  document.head.appendChild(script);
+function fbQR(canvas, url) {
+  const ctx = canvas.getContext('2d'), sz = 100;
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,sz,sz);
+  ctx.fillStyle='#070707'; ctx.font='bold 8px monospace'; ctx.textAlign='center';
+  ctx.fillText('@gustavoobenedetti', sz/2, sz/2-4);
+  ctx.fillText('instagram.com', sz/2, sz/2+12);
 }
 
 updateUI();
-// Draw chart if starting on slide 1
-if (current === 1) drawGrowthChart();
-if (current === 7) drawQR();
 </script>
 </body>
 </html>
